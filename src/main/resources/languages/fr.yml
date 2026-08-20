@@ -1,0 +1,94 @@
+# ============================================================================ #
+#            Kingdoms Addon - Specialties : messages en francais                #
+#                                                                              #
+#  Ce fichier suit exactement la meme structure que les fichiers de langue de   #
+#  KingdomsX : les memes arbres 'command:' et 'specialties:', les memes cles.   #
+#  Une cle absente retombe sur le texte anglais integre a l'extension.          #
+#                                                                              #
+#  NOTE IMPORTANTE : KingdomsX ne propose pas de locale francaise (les langues  #
+#  disponibles sont en, de, es, it, pt, pl, ru, cs, hu, tr, uk, vi, zh). Ce     #
+#  fichier n'est donc jamais charge automatiquement. Sur un serveur francais,   #
+#  qui tourne en anglais, copiez son contenu dans en.yml du meme dossier.       #
+# ============================================================================ #
+
+command:
+  specialty:
+    name: specialite
+    aliases: 'specialty spec'
+    description: '{$s}Gere la specialite de votre royaume.'
+
+    info:
+      description: '{$s}Affiche la specialite de votre royaume.'
+      none: "{$e}Votre royaume n'a pas encore de specialite. hover:{{$es}/k specialty choose;{$p}Cliquez pour choisir;/k specialty choose}"
+      display: |-
+        {$sep}-=[ {$p}Specialite du royaume {$sep}]=-
+        {$p}Specialite{$colon} {$s}%specialty%
+        {$p}Ressource{$colon} {$s}%specialty_resource%
+        {$p}Extracteurs{$colon} {$s}%extractors% {$sep}({$s}%fueled_extractors% {$sep}avec carburant)
+        {$p}Rendement{$colon} {$s}1 {$p}pour {$s}%per_unit% {$p}points de ressources
+        {$p}En attente{$colon} {$s}%remainder%{$sep}/{$s}%per_unit%
+        {$sep}Collectez vos extracteurs pour recuperer la ressource.
+        {$sep}Le choix de la specialite est definitif.
+
+    choose:
+      description: "{$s}Choisit la specialite d'un royaume qui n'en a pas."
+      usage: '{$usage}specialty choose {$p}[specialite]'
+      unknown: "{$es}%specialty% {$e}n'est pas une specialite valide."
+      already-chosen: '{$e}Votre royaume a deja choisi la specialite {$es}%specialty%{$e}. Ce choix est definitif, seul un administrateur peut le modifier.'
+      not-king: '{$e}Seul le roi peut choisir la specialite du royaume.'
+      no-permission: "{$e}Vous n'avez pas la permission de royaume necessaire pour choisir la specialite."
+      low-level: '{$e}Votre royaume doit etre au moins niveau {$es}%required_level% {$e}pour choisir une specialite.'
+      not-enough-resource-points: '{$e}Votre royaume a besoin de {$es}%cost% points de ressources{$e}.'
+      not-enough-money: '{$e}Votre royaume a besoin de {$es}$%cost%{$e}.'
+      confirm: |-
+        {$e}Le choix d'une specialite est {$es}DEFINITIF{$e}. Vous etes sur le point de choisir {$es}%specialty%{$e}.
+        {$e}Recommencez pour confirmer.
+      chosen: '{$p}Votre royaume est desormais {$s}%specialty%{$p}. Ressource unique{$colon} {$s}%specialty_resource%'
+      announcement: '{$s}%player% {$p}a choisi la specialite {$s}%specialty% {$p}pour le royaume.'
+
+  admin:
+    specialty:
+      description: "{$s}Change la specialite d'un royaume."
+      usage: '{$usage}admin specialty {$p}<royaume> <specialite|reset>'
+      unknown: "{$es}%specialty% {$e}n'est pas une specialite valide. Valeurs possibles{$colon} {$es}%specialties%{$e}, {$es}reset"
+      set: '{$p}La specialite de {$s}%kingdoms_kingdom_name% {$p}est desormais {$s}%specialty%{$p}.'
+      reset: '{$p}La specialite de {$s}%kingdoms_kingdom_name% {$p}a ete reinitialisee.'
+      changed-notification: '{$e}Un administrateur a change la specialite de votre royaume en {$es}%specialty%{$e}.'
+      reset-notification: '{$e}Un administrateur a reinitialise la specialite de votre royaume.'
+
+specialties:
+
+  creation:
+    choose-first: |-
+      {$p}Choisissez la specialite de votre royaume pour valider sa creation.
+      {$e}Ce choix est definitif et ne pourra plus etre modifie.
+    chosen: |-
+      {$p}Royaume fonde avec la specialite {$s}%specialty%{$p}.
+      {$p}Ressource unique{$colon} {$s}%specialty_resource%
+    expired: '{$e}La creation a expire. Relancez la commande {$es}/k create <nom>{$e}.'
+
+  extraction:
+    collected: "{$p}L'extracteur vous rapporte {$s}%collected%x %specialty_resource%{$p}."
+    not-enough-yet: '{$sep}Extraction de %specialty_resource%{$sep}{$colon} {$s}%remainder%{$sep}/{$s}%per_unit% {$sep}points de ressources.'
+    inventory-full: '{$e}Votre inventaire est plein, le reste est garde pour la prochaine collecte.'
+
+  forge:
+    missing-ingredients: '{$e}Il vous manque des ingredients pour cette recette.'
+    crafted: '{$p}Forge{$colon} {$s}%recipe%'
+    enchanted: '{$p}Enchantement applique{$colon} {$s}%recipe% {$sep}(niveau {$s}%level%{$sep})'
+
+    enchant:
+      no-item: "{$e}Tenez en main l'objet a enchanter, puis cliquez."
+      wrong-item: "{$e}Cet enchantement ne s'applique pas a l'objet que vous tenez."
+      already: '{$e}Cet objet possede deja cet enchantement au niveau {$es}%level%{$e} ou plus.'
+
+    # Lignes construites par le menu de la forge pour chaque recette.
+    entry:
+      enchantment: '&7Enchantement &f%enchantment% &7niveau &e%level%'
+      beyond-vanilla: '&8Au-dela de la limite vanilla'
+      ingredients: '&7Ingredients requis&8:'
+      ingredient-ok: '&a %owned%/%required% &7%ingredient%'
+      ingredient-missing: '&c %owned%/%required% &7%ingredient%'
+      hold-item: "&7Tenez l'objet en main, puis cliquez."
+      click-to-forge: '&aCliquez pour forger.'
+      missing: '&cIngredients manquants.'

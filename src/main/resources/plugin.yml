@@ -1,0 +1,8 @@
+main: org.kingdoms.specialties.SpecialtiesAddon
+name: Specialties
+description: "${project.description}"
+version: "${project.version}"
+author: KingdomX-Speciality
+api-version: "1.16"
+folia-supported: true
+depend: [ Kingdoms ]

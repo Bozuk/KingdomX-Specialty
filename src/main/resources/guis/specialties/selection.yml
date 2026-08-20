@@ -1,0 +1,52 @@
+title: "{$sep}-=[ {$p}Specialite du royaume {$sep}]=-"
+rows: 3
+sound: BLOCK_ENDER_CHEST_OPEN
+
+# Le materiau, le nom et la description des 4 options sont pris dans specialties.yml
+# (icon / display-name / description). Le 'lore' ci-dessous est ajoute a la suite.
+options:
+  decoration:
+    slots: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 15, 17, 18, 19, 20, 21, 23, 24, 25, 26 ]
+    material: BLACK_STAINED_GLASS_PANE
+    name: ''
+
+  warning:
+    slot: 22
+    material: PAPER
+    name: '{$e}Choix definitif'
+    lore: |
+      {$sep}Une fois la specialite choisie,
+      {$sep}elle ne peut plus etre changee.
+      {$sep}Seul un administrateur peut la modifier.
+
+  weaponsmith:
+    slot: 10
+    material: NETHERITE_SWORD
+    sound: BLOCK_ANVIL_USE
+    lore: |
+
+      {$p}Cliquez {$sep}pour choisir cette specialite.
+
+  armorer:
+    slot: 12
+    material: NETHERITE_CHESTPLATE
+    sound: BLOCK_ANVIL_USE
+    lore: |
+
+      {$p}Cliquez {$sep}pour choisir cette specialite.
+
+  alchemist:
+    slot: 14
+    material: BREWING_STAND
+    sound: BLOCK_BREWING_STAND_BREW
+    lore: |
+
+      {$p}Cliquez {$sep}pour choisir cette specialite.
+
+  farmer:
+    slot: 16
+    material: GOLDEN_CARROT
+    sound: ENTITY_PLAYER_LEVELUP
+    lore: |
+
+      {$p}Cliquez {$sep}pour choisir cette specialite.

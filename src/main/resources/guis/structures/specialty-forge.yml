@@ -1,0 +1,49 @@
+title: "{$sep}-=[ {$p}Forge de Specialite {$sep}]=-"
+rows: 6
+sound: BLOCK_ANVIL_USE
+
+options:
+  decoration:
+    slots: [ 0, 1, 2, 3, 5, 6, 7, 8, 9, 17, 18, 26, 27, 35, 36, 44, 45, 46, 47, 49, 51, 52, 53 ]
+    material: BLACK_STAINED_GLASS_PANE
+    name: ''
+
+  info:
+    slot: 4
+    material: PAPER
+    name: '{$p}Specialite{$colon} {$s}%specialty%'
+    lore: |
+      {$p}Ressource{$colon} {$s}%specialty_resource%
+      {$p}Recettes{$colon} {$s}%recipes%
+
+      {$sep}Les ingredients sont pris
+      {$sep}dans votre inventaire.
+
+  # Une entree par recette de la specialite. Le nom, l'icone et la description
+  # sont remplaces a l'ouverture par le contenu de specialties.yml.
+  recipes:
+    slots: [ 10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43 ]
+    material: PAPER
+    name: '{$p}Recette'
+
+  upgrade:
+    slot: 48
+    upgrade:
+      condition: level < max_level
+      name: "{$sp}Ameliorer{$colon} {$s}%roman@level% {$sep}> {$s}%roman@next_level%"
+      material: NETHER_STAR
+      lore:
+        - "{$dot} {$p}Cout{$colon} {$s}%upgrade_cost%"
+    maxxed:
+      name: "{$sp}Niveau{$colon} {$s}%roman@level%"
+      material: NETHER_STAR
+      lore:
+        - "{$sep}Niveau maximum atteint."
+
+  break:
+    slot: 50
+    name: "&4Demolir"
+    material: REDSTONE_BLOCK
+    sound: ENTITY_ITEM_BREAK
+    lore:
+      - "{$s}Detruit la structure."
