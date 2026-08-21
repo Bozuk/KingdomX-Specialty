@@ -4,15 +4,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 import org.kingdoms.constants.group.Kingdom;
 import org.kingdoms.constants.land.Land;
 import org.kingdoms.constants.land.structures.objects.Extractor;
 import org.kingdoms.constants.player.KingdomPlayer;
 import org.kingdoms.events.items.structures.ExtractorCollectEvent;
+import org.kingdoms.libs.xseries.XItemStack;
 import org.kingdoms.specialties.config.SpecialtiesLang;
 import org.kingdoms.specialties.data.KingdomSpecialties;
 import org.kingdoms.specialties.data.Specialty;
-import org.kingdoms.specialties.items.ItemGiver;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Turns the resource points a KingdomsX extractor produced into the unique resource of the
@@ -68,7 +72,7 @@ public final class ExtractionListener implements Listener {
         }
 
         if (units > 0) {
-            long undelivered = ItemGiver.give(player, specialty, units, ExtractionSettings.dropIfInventoryFull());
+            long undelivered = deliver(player, specialty, units, ExtractionSettings.dropIfInventoryFull());
             if (undelivered > 0) {
                 remainder += undelivered * perUnit;
                 units -= undelivered;
@@ -89,6 +93,36 @@ public final class ExtractionListener implements Listener {
                     "per_unit", perUnit,
                     "specialty_resource", specialty.getResourceName());
         }
+    }
+
+    /**
+     * Hands the resource over, stack by stack.
+     *
+     * @param dropOverflow whether the part that doesn't fit is dropped at the player's feet. When
+     *                     it isn't, the leftover goes back into the kingdom's production remainder
+     *                     rather than vanishing.
+     * @return the number of units that could not be delivered.
+     */
+    private long deliver(Player player, Specialty specialty, long units, boolean dropOverflow) {
+        ItemStack prototype = specialty.getResource();
+        if (prototype == null) return units;
+
+        int maxStackSize = Math.max(1, prototype.getMaxStackSize());
+        List<ItemStack> stacks = new ArrayList<>();
+        for (long left = units; left > 0; ) {
+            int size = (int) Math.min(left, maxStackSize);
+            stacks.add(specialty.getResource(size));
+            left -= size;
+        }
+
+        ItemStack[] items = stacks.toArray(new ItemStack[0]);
+        List<ItemStack> rejected = dropOverflow
+                ? XItemStack.giveOrDrop(player, items)
+                : XItemStack.addItems(player.getInventory(), false, items);
+
+        long undelivered = 0;
+        for (ItemStack left : rejected) undelivered += left.getAmount();
+        return undelivered;
     }
 
     private Player onlineCollector(ExtractorCollectEvent event) {

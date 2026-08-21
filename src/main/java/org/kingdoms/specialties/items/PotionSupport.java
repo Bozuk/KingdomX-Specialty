@@ -6,6 +6,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+import org.kingdoms.libs.xseries.XPotion;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -19,11 +20,15 @@ import java.util.Map;
  * Reads what a potion item would actually do once drunk: its custom effects, and - for an ordinary
  * brewed potion - the effect its base type stands for.
  * <p>
- * Everything goes through reflection, for the same reason as {@link AttributeSupport}. 1.20.5
- * replaced {@code PotionMeta#getBasePotionData()} - which returns a {@code PotionData} carrying
- * {@code extended} and {@code upgraded} flags - with {@code getBasePotionType()}, where every
- * variant is its own {@code PotionType} that knows its effects. Both paths are tried, so the addon
- * keeps reading potions correctly from 1.16 to today.
+ * This is the one direction XSeries does not cover. {@code XItemStack} turns configuration into an
+ * item; nothing turns an item back into the effects it carries, which is exactly what a
+ * transmutation recipe needs in order to copy the duration and the level of the bottle a player
+ * brought. XSeries still does the version-sensitive part: {@link XPotion} identifies an effect and
+ * a potion type whatever the running release calls them.
+ * <p>
+ * The rest goes through reflection because 1.20.5 replaced {@code PotionMeta#getBasePotionData()} -
+ * a type plus {@code extended} and {@code upgraded} flags - with {@code getBasePotionType()}, where
+ * every variant is its own {@code PotionType} that knows its own effects. Both paths are tried.
  */
 public final class PotionSupport {
     /**
@@ -78,34 +83,15 @@ public final class PotionSupport {
         return effects;
     }
 
-    /** Two effect types can be different objects for the same effect once a registry is involved. */
+    /**
+     * Two effect types can be different objects for the same effect once a registry is involved,
+     * and the same effect answers to two names across the 1.20.5 rename. Comparing the XSeries
+     * constants settles both.
+     */
     public static boolean isSame(PotionEffectType left, PotionEffectType right) {
         if (left == right) return true;
         if (left == null || right == null) return false;
-        return keyOf(left).equals(keyOf(right));
-    }
-
-    /**
-     * The stable, upper case name of an effect - {@code STRENGTH} on a modern server,
-     * {@code INCREASE_DAMAGE} on an older one. {@code PotionEffectType} only became
-     * {@code Keyed} along the way, hence the reflection.
-     */
-    @SuppressWarnings("deprecation")
-    public static String keyOf(PotionEffectType type) {
-        if (type == null) return "";
-        try {
-            Object key = PotionEffectType.class.getMethod("getKey").invoke(type);
-            if (key != null) {
-                String raw = key.toString();
-                int colon = raw.indexOf(':');
-                return (colon < 0 ? raw : raw.substring(colon + 1)).toUpperCase(Locale.ENGLISH);
-            }
-        } catch (ReflectiveOperationException | RuntimeException | LinkageError ignored) {
-            // Server without a keyed PotionEffectType, the legacy name it is.
-        }
-
-        String name = type.getName();
-        return name == null ? "" : name.toUpperCase(Locale.ENGLISH);
+        return XPotion.of(left) == XPotion.of(right);
     }
 
     // -------------------------------------------------------------- base potion
@@ -142,16 +128,15 @@ public final class PotionSupport {
 
             Class<?> dataClass = data.getClass();
             Object type = dataClass.getMethod("getType").invoke(data);
-            if (type == null) return Collections.emptyList();
+            if (!(type instanceof PotionType)) return Collections.emptyList();
 
             boolean extended = Boolean.TRUE.equals(dataClass.getMethod("isExtended").invoke(data));
             boolean upgraded = Boolean.TRUE.equals(dataClass.getMethod("isUpgraded").invoke(data));
 
-            Object effectType = PotionType.class.getMethod("getEffectType").invoke(type);
-            if (!(effectType instanceof PotionEffectType)) return Collections.emptyList();
+            PotionEffectType effectType = XPotion.of((PotionType) type).getPotionEffectType();
+            if (effectType == null) return Collections.emptyList();
 
-            String name = ((Enum<?>) type).name().toUpperCase(Locale.ENGLISH);
-            int[] durations = LEGACY_DURATIONS.get(name);
+            int[] durations = LEGACY_DURATIONS.get(((PotionType) type).name().toUpperCase(Locale.ENGLISH));
             if (durations == null) return Collections.emptyList();
 
             int ticks = durations[0];
@@ -159,8 +144,7 @@ public final class PotionSupport {
             else if (extended && durations[1] > 0) ticks = durations[1];
             if (ticks <= 0) return Collections.emptyList();
 
-            return Collections.singletonList(
-                    new PotionEffect((PotionEffectType) effectType, ticks, upgraded ? 1 : 0));
+            return Collections.singletonList(new PotionEffect(effectType, ticks, upgraded ? 1 : 0));
         } catch (ReflectiveOperationException | RuntimeException | LinkageError ex) {
             return null;
         }

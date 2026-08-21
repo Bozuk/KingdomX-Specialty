@@ -4,7 +4,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.potion.PotionEffect;
+import org.kingdoms.libs.xseries.XPotion;
 import org.kingdoms.specialties.items.SpecialtyItems;
 
 import java.util.List;
@@ -22,9 +22,9 @@ public final class ConsumeListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onConsume(PlayerItemConsumeEvent event) {
-        List<PotionEffect> effects = SpecialtyItems.getConsumeEffects(event.getItem());
+        List<XPotion.Effect> effects = SpecialtyItems.getConsumeEffects(event.getItem());
         if (effects.isEmpty()) return;
 
-        for (PotionEffect effect : effects) event.getPlayer().addPotionEffect(effect);
+        for (XPotion.Effect effect : effects) effect.apply(event.getPlayer());
     }
 }

@@ -115,24 +115,35 @@ extraction:
 #                 permet a une potion de poison de devenir une potion de wither #
 #                 de la meme duree et du meme niveau, quelle que soit la fiole. #
 #                                                                              #
-#  Les noms d'effets acceptent les deux orthographes : STRENGTH comme          #
-#  INCREASE_DAMAGE, 1.20.5 ayant renomme les effets.                            #
+#  Les noms d'effets et d'attributs acceptent toutes leurs orthographes :       #
+#  STRENGTH comme INCREASE_DAMAGE, ARMOR comme GENERIC_ARMOR. XSeries fait la   #
+#  correspondance avec ce que la version du serveur utilise vraiment.           #
 #                                                                              #
 #  '@resource' designe la ressource unique de la specialite.                    #
 #                                                                              #
-#  Un objet ('result' ou 'resource') se decrit ainsi :                          #
-#    material / amount / name / lore / custom-model-data / unbreakable /        #
-#    glow / enchants / stored-enchants / item-flags / potion / attributes /     #
-#    consume-effects                                                            #
+#  ---------------------------------------------------------------------------  #
+#  Un objet ('result' ou 'resource') se decrit avec LA MEME SYNTAXE que         #
+#  n'importe quel objet de KingdomsX : c'est son deserialiseur qui est appele.  #
+#  Donc material / amount / name / lore / enchants / stored-enchants / flags /  #
+#  attributes / effects / color / custom-model-data / unbreakable / glow /      #
+#  damage / skull / trim / item-model / nbt ... voyez les fichiers du plugin    #
+#  principal pour la liste complete.                                            #
 #                                                                              #
-#  'glow' donne le reflet enchante sans enchantement quand le serveur le permet #
-#  (1.20.5+). Sur un serveur plus ancien, il retombe sur l'astuce habituelle -  #
-#  Solidite I masquee - qui, elle, change legerement l'objet.                   #
+#  Deux options en plus, propres a l'extension :                                #
 #                                                                              #
-#  'consume-effects' donne des effets a un ALIMENT quand il est mange. Les      #
-#  effets d'une pomme d'or sont codes en dur dans le jeu et ne s'editent pas :  #
-#  ils sont donc appliques par l'extension au moment ou l'objet est consomme,   #
-#  juste avant ceux du jeu, qui ne peuvent alors plus les affaiblir.            #
+#    glint : le reflet enchante par le composant prevu pour ca (1.20.5+).       #
+#            A preferer a 'glow', qui obtient le meme reflet avec un            #
+#            enchantement masque - et donne donc une Solidite I bien reelle a   #
+#            l'objet, ce qui casse le "memes caracteristiques que la netherite".#
+#                                                                              #
+#    consume-effects : ce qu'un ALIMENT donne quand il est mange. Les effets    #
+#            d'une pomme d'or sont codes en dur dans le jeu et ne s'editent     #
+#            pas : ils sont appliques par l'extension a la consommation, juste  #
+#            avant ceux du jeu, qui ne peuvent alors plus les affaiblir.        #
+#            Meme forme que 'effects' :  'EFFET, secondes, niveau'              #
+#            Le niveau part de 1 :  'ABSORPTION, 120, 2'  =  Absorption II      #
+#            pendant deux minutes.                                              #
+#  ---------------------------------------------------------------------------  #
 #                                                                              #
 #  'attributes' remplace les statistiques de base de l'objet : c'est ce qui     #
 #  permet de depasser reellement la netherite. Quand vous en definissez un sur  #
@@ -164,7 +175,7 @@ specialties:
     resource:
       material: COAL
       name: '&8&lCarbone'
-      glow: true
+      glint: true
       lore:
         - '&8Ressource de specialite'
         - '&7Extrait par les forgerons du royaume.'
@@ -185,15 +196,15 @@ specialties:
         result:
           material: NETHERITE_SWORD
           name: '&8&lEpee de Carbone'
-          glow: true
+          glint: true
           lore:
             - '&7Trempee dans le carbone du royaume.'
           attributes:
-            GENERIC_ATTACK_DAMAGE:
+            ATTACK_DAMAGE:
               amount: 9
               operation: ADD_NUMBER
               slot: HAND
-            GENERIC_ATTACK_SPEED:
+            ATTACK_SPEED:
               amount: -2.4
               operation: ADD_NUMBER
               slot: HAND
@@ -213,15 +224,15 @@ specialties:
         result:
           material: NETHERITE_AXE
           name: '&8&lHache de Carbone'
-          glow: true
+          glint: true
           lore:
             - '&7Trempee dans le carbone du royaume.'
           attributes:
-            GENERIC_ATTACK_DAMAGE:
+            ATTACK_DAMAGE:
               amount: 11
               operation: ADD_NUMBER
               slot: HAND
-            GENERIC_ATTACK_SPEED:
+            ATTACK_SPEED:
               amount: -3.0
               operation: ADD_NUMBER
               slot: HAND
@@ -248,15 +259,15 @@ specialties:
         result:
           material: NETHERITE_SPEAR
           name: '&8&lLance de Carbone'
-          glow: true
+          glint: true
           lore:
             - '&7Trempee dans le carbone du royaume.'
           attributes:
-            GENERIC_ATTACK_DAMAGE:
+            ATTACK_DAMAGE:
               amount: 6
               operation: ADD_NUMBER
               slot: HAND
-            GENERIC_ATTACK_SPEED:
+            ATTACK_SPEED:
               amount: -3.13
               operation: ADD_NUMBER
               slot: HAND
@@ -280,7 +291,7 @@ specialties:
     resource:
       material: IRON_INGOT
       name: '&b&lMitril'
-      glow: true
+      glint: true
       lore:
         - '&8Ressource de specialite'
         - '&7Martele par les armuriers du royaume.'
@@ -301,19 +312,19 @@ specialties:
         result:
           material: NETHERITE_HELMET
           name: '&b&lCasque de Mitril'
-          glow: true
+          glint: true
           lore:
             - '&7Martele dans le mitril du royaume.'
           attributes:
-            GENERIC_ARMOR:
+            ARMOR:
               amount: 5
               operation: ADD_NUMBER
               slot: HEAD
-            GENERIC_ARMOR_TOUGHNESS:
+            ARMOR_TOUGHNESS:
               amount: 4
               operation: ADD_NUMBER
               slot: HEAD
-            GENERIC_KNOCKBACK_RESISTANCE:
+            KNOCKBACK_RESISTANCE:
               amount: 0.1
               operation: ADD_NUMBER
               slot: HEAD
@@ -333,19 +344,19 @@ specialties:
         result:
           material: NETHERITE_CHESTPLATE
           name: '&b&lPlastron de Mitril'
-          glow: true
+          glint: true
           lore:
             - '&7Martele dans le mitril du royaume.'
           attributes:
-            GENERIC_ARMOR:
+            ARMOR:
               amount: 10
               operation: ADD_NUMBER
               slot: CHEST
-            GENERIC_ARMOR_TOUGHNESS:
+            ARMOR_TOUGHNESS:
               amount: 4
               operation: ADD_NUMBER
               slot: CHEST
-            GENERIC_KNOCKBACK_RESISTANCE:
+            KNOCKBACK_RESISTANCE:
               amount: 0.1
               operation: ADD_NUMBER
               slot: CHEST
@@ -365,19 +376,19 @@ specialties:
         result:
           material: NETHERITE_LEGGINGS
           name: '&b&lPantalon de Mitril'
-          glow: true
+          glint: true
           lore:
             - '&7Martele dans le mitril du royaume.'
           attributes:
-            GENERIC_ARMOR:
+            ARMOR:
               amount: 8
               operation: ADD_NUMBER
               slot: LEGS
-            GENERIC_ARMOR_TOUGHNESS:
+            ARMOR_TOUGHNESS:
               amount: 4
               operation: ADD_NUMBER
               slot: LEGS
-            GENERIC_KNOCKBACK_RESISTANCE:
+            KNOCKBACK_RESISTANCE:
               amount: 0.1
               operation: ADD_NUMBER
               slot: LEGS
@@ -397,19 +408,19 @@ specialties:
         result:
           material: NETHERITE_BOOTS
           name: '&b&lBottes de Mitril'
-          glow: true
+          glint: true
           lore:
             - '&7Martelees dans le mitril du royaume.'
           attributes:
-            GENERIC_ARMOR:
+            ARMOR:
               amount: 5
               operation: ADD_NUMBER
               slot: FEET
-            GENERIC_ARMOR_TOUGHNESS:
+            ARMOR_TOUGHNESS:
               amount: 4
               operation: ADD_NUMBER
               slot: FEET
-            GENERIC_KNOCKBACK_RESISTANCE:
+            KNOCKBACK_RESISTANCE:
               amount: 0.1
               operation: ADD_NUMBER
               slot: FEET
@@ -428,7 +439,7 @@ specialties:
     resource:
       material: SLIME_BALL
       name: '&a&lGoo'
-      glow: true
+      glint: true
       lore:
         - '&8Ressource de specialite'
         - '&7Distille par les alchimistes du royaume.'
@@ -456,11 +467,10 @@ specialties:
         result:
           material: POTION
           name: '&8&lPotion de Wither'
-          glow: true
+          glint: true
+          color: '#3b3b3b'
           lore:
             - '&7Sublimee au goo du royaume.'
-          potion:
-            color: '#3b3b3b'
 
       # Potion de force II + Goo = potion de force III, meme duree.
       # 'amplifier: 1' vise la force II exactement : sans cela, la force III
@@ -485,11 +495,10 @@ specialties:
         result:
           material: POTION
           name: '&4&lPotion de Force III'
-          glow: true
+          glint: true
+          color: '#c02020'
           lore:
             - '&7Sublimee au goo du royaume.'
-          potion:
-            color: '#c02020'
 
       # Pomme d'or + Goo = pomme d'or sublimee.
       # Absorption II et Regeneration IV, contre I et II pour la pomme normale.
@@ -507,13 +516,9 @@ specialties:
         result:
           material: GOLDEN_APPLE
           name: '&6&lPomme d Or Sublimee'
-          glow: true
+          glint: true
           lore:
             - '&7Sublimee au goo du royaume.'
           consume-effects:
-            ABSORPTION:
-              duration: 2min
-              amplifier: 1
-            REGENERATION:
-              duration: 5s
-              amplifier: 3
+            - 'ABSORPTION, 120, 2'
+            - 'REGENERATION, 5, 4'

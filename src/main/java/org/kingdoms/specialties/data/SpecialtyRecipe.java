@@ -8,10 +8,10 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.kingdoms.config.accessor.ConfigAccessor;
 import org.kingdoms.specialties.SpecialtiesAddon;
-import org.kingdoms.specialties.items.ItemParser;
+import org.kingdoms.locale.messenger.StaticMessenger;
+import org.kingdoms.specialties.items.ItemFactory;
 import org.kingdoms.specialties.items.PotionSupport;
 import org.kingdoms.specialties.items.SpecialtyItems;
-import org.kingdoms.specialties.items.TextUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -188,7 +188,7 @@ public final class SpecialtyRecipe {
 
             ConfigAccessor transmute = section.gotoSection("transmute");
             transmuteEffect = transmute.isSet("effect")
-                    ? ItemParser.matchPotionEffect(transmute.getString("effect"))
+                    ? ItemFactory.effect(transmute.getString("effect"))
                     : null;
             if (transmuteEffect == null) {
                 SpecialtiesAddon.get().getLogger().severe(
@@ -210,22 +210,24 @@ public final class SpecialtyRecipe {
         }
 
         String displayName = section.isSet("display-name")
-                ? TextUtil.colorize(section.getString("display-name"))
+                ? new StaticMessenger(section.getString("display-name")).parse()
                 : null;
 
         List<String> description = new ArrayList<>();
         if (section.isSet("description")) {
-            for (String line : section.getStringList("description")) description.add(TextUtil.colorize(line));
+            for (String line : section.getStringList("description")) {
+                description.add(new StaticMessenger(line).parse());
+            }
         }
 
-        Material icon = section.isSet("icon") ? ItemParser.matchMaterial(section.getString("icon")) : null;
+        Material icon = section.isSet("icon") ? ItemFactory.material(section.getString("icon")) : null;
 
         if (!section.isSet("result")) {
             SpecialtiesAddon.get().getLogger().severe("The recipe '" + id + "' has no 'result' section.");
             return null;
         }
 
-        ItemStack result = ItemParser.parse(section.gotoSection("result"), "The result of the recipe " + id);
+        ItemStack result = ItemFactory.parse(section.gotoSection("result"), "The result of the recipe " + id);
         if (result == null) return null;
 
         return new SpecialtyRecipe(specialty, id, transmuting ? Type.TRANSMUTE : Type.CRAFT, ingredients,
@@ -241,14 +243,14 @@ public final class SpecialtyRecipe {
         }
 
         ConfigAccessor source = section.gotoSection("source");
-        Material material = source.isSet("material") ? ItemParser.matchMaterial(source.getString("material")) : null;
+        Material material = source.isSet("material") ? ItemFactory.material(source.getString("material")) : null;
         if (material == null) {
             SpecialtiesAddon.get().getLogger().severe("The source of the recipe '" + id + "' has no known material.");
             return null;
         }
 
         PotionEffectType effect = source.isSet("effect")
-                ? ItemParser.matchPotionEffect(source.getString("effect"))
+                ? ItemFactory.effect(source.getString("effect"))
                 : null;
         if (effect == null) {
             SpecialtiesAddon.get().getLogger().severe(
@@ -260,7 +262,7 @@ public final class SpecialtyRecipe {
         // level only, which is what keeps "strength II becomes strength III" from ever laddering.
         Integer amplifier = source.isSet("amplifier") ? source.getInt("amplifier") : null;
         int amount = source.isSet("amount") ? Math.max(1, source.getInt("amount")) : 1;
-        String name = source.isSet("name") ? TextUtil.colorize(source.getString("name")) : null;
+        String name = source.isSet("name") ? new StaticMessenger(source.getString("name")).parse() : null;
 
         return new Ingredient(null, material, amount, effect, amplifier, name);
     }
@@ -320,7 +322,7 @@ public final class SpecialtyRecipe {
                 continue;
             }
 
-            Material material = ItemParser.matchMaterial(raw);
+            Material material = ItemFactory.material(raw);
             if (material == null) {
                 SpecialtiesAddon.get().getLogger().severe(
                         "The recipe '" + id + "' uses an unknown material: " + raw);

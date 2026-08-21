@@ -28,6 +28,8 @@
         -->
         <kingdoms.version>1.17.27.3</kingdoms.version>
         <spigot.version>1.16.5-R0.1-SNAPSHOT</spigot.version>
+        <!-- Must match the version KingdomsX loads into its own classloader, see the dependency below. -->
+        <xseries.version>13.7.1</xseries.version>
     </properties>
 
     <repositories>
@@ -48,6 +50,22 @@
             <groupId>com.github.cryptomorin</groupId>
             <artifactId>kingdoms</artifactId>
             <version>${kingdoms.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--
+          XSeries: the cross-version library KingdomsX itself builds on. It downloads it, relocates
+          com.cryptomorin.xseries to org.kingdoms.libs.xseries and injects it into its OWN plugin
+          classloader, so an addon that depends on Kingdoms sees it at runtime.
+
+          Hence 'provided' plus the shade relocation below: we compile against the library and let
+          the relocation rewrite our references to the package KingdomsX actually loaded, without
+          shipping a single class of it. Bundling our own copy would only mean two XSeries on the
+          server, and the wrong one winning.
+        -->
+        <dependency>
+            <groupId>com.github.cryptomorin</groupId>
+            <artifactId>XSeries</artifactId>
+            <version>${xseries.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -79,6 +97,33 @@
                 <configuration>
                     <release>8</release>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <!--
+                              Rewrites this addon's own references. XSeries is 'provided', so none
+                              of its classes end up in the jar: the relocation only points us at
+                              the copy KingdomsX already loaded.
+                            -->
+                            <relocations>
+                                <relocation>
+                                    <pattern>com.cryptomorin.xseries</pattern>
+                                    <shadedPattern>org.kingdoms.libs.xseries</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
