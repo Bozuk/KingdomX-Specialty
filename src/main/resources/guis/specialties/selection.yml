@@ -1,9 +1,10 @@
-title: "{$sep}-=[ {$p}Specialite du royaume {$sep}]=-"
+title: "{$sep}-=[ {$p}Kingdom specialty {$sep}]=-"
 rows: 3
 sound: BLOCK_ENDER_CHEST_OPEN
 
-# Le materiau, le nom et la description des 3 options sont pris dans specialties.yml
-# (icon / display-name / description). Le 'lore' ci-dessous est ajoute a la suite.
+# The material, the name and the description of the 3 options come from
+# specialties.yml (icon / display-name / description). The 'lore' below is
+# appended after them.
 options:
   decoration:
     slots: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25, 26 ]
@@ -13,11 +14,11 @@ options:
   warning:
     slot: 22
     material: PAPER
-    name: '{$e}Choix definitif'
+    name: '{$e}Final choice'
     lore: |
-      {$sep}Une fois la specialite choisie,
-      {$sep}elle ne peut plus etre changee.
-      {$sep}Seul un administrateur peut la modifier.
+      {$sep}Once the specialty is picked,
+      {$sep}it can never be changed.
+      {$sep}Only an administrator can alter it.
 
   weaponsmith:
     slot: 11
@@ -25,7 +26,7 @@ options:
     sound: BLOCK_ANVIL_USE
     lore: |
 
-      {$p}Cliquez {$sep}pour choisir cette specialite.
+      {$p}Click {$sep}to pick this specialty.
 
   armorer:
     slot: 13
@@ -33,7 +34,7 @@ options:
     sound: BLOCK_ANVIL_USE
     lore: |
 
-      {$p}Cliquez {$sep}pour choisir cette specialite.
+      {$p}Click {$sep}to pick this specialty.
 
   alchemist:
     slot: 15
@@ -41,4 +42,4 @@ options:
     sound: BLOCK_BREWING_STAND_BREW
     lore: |
 
-      {$p}Cliquez {$sep}pour choisir cette specialite.
+      {$p}Click {$sep}to pick this specialty.

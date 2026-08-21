@@ -65,8 +65,8 @@ public final class SpecialtiesLanguages {
      * The translation file a language reads from.
      * <p>
      * Normally the language's own code, but {@code messages.language-files} can point a language
-     * somewhere else. That matters here: KingdomsX has no French locale, so a French server runs
-     * in English and maps {@code EN} to {@code fr}.
+     * somewhere else. That is what a language KingdomsX does not ship needs: it has no French
+     * locale, so a French server runs in English and points {@code EN} at {@code fr}.
      */
     private static String fileCodeOf(SupportedLanguage language) {
         ConfigAccessor root = SpecialtiesConfig.accessor();

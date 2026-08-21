@@ -1,37 +1,37 @@
 # ============================================================================ #
 #                        Kingdoms Addon - Specialties                          #
 #                                                                              #
-#  Chaque royaume choisit UNE specialite parmi 3, AU MOMENT DE SA CREATION :    #
-#  /k create <nom> ouvre le menu des specialites, et le royaume n'est fonde     #
-#  qu'une fois la specialite choisie. La specialite donne acces a une ressource #
-#  unique, produite par les extracteurs de KingdomsX, qui sert a fabriquer des  #
-#  objets exclusifs a la Forge de Specialite.                                   #
+#  Every kingdom picks ONE of 3 specialties, WHEN IT IS FOUNDED: /k create      #
+#  <name> opens the specialty menu, and the kingdom only comes into existence   #
+#  once the choice is made. A specialty grants a unique resource, produced by   #
+#  the KingdomsX extractors, which is what the exclusive items of the Specialty #
+#  Forge are made of.                                                           #
 #                                                                              #
-#  Le choix est DEFINITIF. Seul un admin peut le modifier :                     #
-#     /k admin specialty <royaume> <specialite>                                 #
-#     /k admin specialty <royaume> reset                                        #
+#  The choice is FINAL. Only an admin can change it:                            #
+#     /k admin specialty <kingdom> <specialty>                                  #
+#     /k admin specialty <kingdom> reset                                        #
 # ============================================================================ #
 
 selection:
-  # Demander une confirmation avant de valider (le choix est irreversible).
-  # S'applique aussi bien a la creation qu'au rattrapage ci-dessous.
+  # Ask for a confirmation before committing (the choice cannot be undone).
+  # Applies both to the founding of a kingdom and to the catch-up below.
   require-confirmation: true
 
   # ---------------------------------------------------------------------------
-  #  Les options suivantes ne concernent QUE le rattrapage, c'est-a-dire la
-  #  commande /k specialty choose. Elle ne sert qu'aux royaumes qui n'ont pas
-  #  de specialite : ceux crees avant l'installation de l'extension, et ceux
-  #  qu'un admin a reinitialises. Un royaume fonde normalement a deja la sienne.
+  #  The options below only concern the catch-up, that is the
+  #  /k specialty choose command. It exists for the kingdoms that have no
+  #  specialty: those founded before this addon was installed, and those an
+  #  admin has reset. A kingdom founded normally already has one.
   # ---------------------------------------------------------------------------
 
-  # Seul le roi peut rattraper le choix.
-  # Si false, tout membre ayant la permission de royaume "UPGRADE" peut le faire.
+  # Only the king may pick the specialty afterwards.
+  # When false, any member with the "UPGRADE" kingdom permission can.
   king-only: true
 
-  # Niveau minimum du royaume requis.
+  # Minimum kingdom level required.
   required-level: 1
 
-  # Cout du rattrapage.
+  # What the catch-up costs.
   cost:
     resource-points: 0
     money: 0
@@ -39,158 +39,157 @@ selection:
 # ============================================================================ #
 #                                   MESSAGES                                    #
 #                                                                              #
-#  Les messages de l'extension vivent dans un fichier par langue :              #
+#  The addon's messages live in one file per language:                          #
 #     plugins/Kingdoms/specialties/languages/<code>.yml                         #
-#  Meme structure que les fichiers de langue de KingdomsX. Une cle absente      #
-#  retombe sur le texte anglais integre a l'extension.                          #
+#  Same layout as the KingdomsX language files. A missing key falls back to     #
+#  the English text built into the addon.                                       #
 #                                                                              #
-#  Un fichier est cree pour chaque langue installee sur le serveur. Le francais #
-#  (fr.yml) est fourni traduit, les autres sont generes en anglais, prets a     #
-#  traduire.                                                                    #
+#  A file is created for every language installed on the server. French         #
+#  (fr.yml) ships translated, the others are generated from the English texts,  #
+#  ready to be translated.                                                      #
+#                                                                              #
+#  A language reads the file of its own code, and nothing has to be written     #
+#  down for that. The exception is a language KingdomsX does not have: it has   #
+#  no French locale - the ones it ships are en, de, es, it, pt, pl, ru, cs, hu, #
+#  tr, uk, vi, zh - so a French server runs in English. Pointing EN at fr.yml   #
+#  is what gives it French messages. Uncomment to do so:                        #
+#                                                                              #
+#     messages:                                                                 #
+#       language-files:                                                         #
+#         EN: fr                                                                #
 # ============================================================================ #
-messages:
-  # Quel fichier de traduction utiliser pour quelle langue de KingdomsX.
-  #
-  # KingdomsX ne propose pas de locale francaise : les langues disponibles sont
-  # en, de, es, it, pt, pl, ru, cs, hu, tr, uk, vi, zh. Un serveur francais
-  # tourne donc en anglais, d'ou la correspondance EN -> fr livree par defaut,
-  # qui accorde les messages avec les menus et les objets, eux aussi en francais.
-  #
-  # Supprimez la ligne pour revenir a l'anglais, ou pointez une autre langue
-  # vers le fichier de votre choix, par exemple  DE: de
-  language-files:
-    EN: fr
 
 # ============================================================================ #
 #                                 PRODUCTION                                    #
 #                                                                              #
-#  La ressource de specialite est produite par les extracteurs de KingdomsX     #
-#  (la structure "extractor"). Cette extension n'ajoute aucun bloc : quand un   #
-#  membre collecte un extracteur, il recoit ses points de ressources habituels  #
-#  ET la ressource unique de la specialite de son royaume.                      #
+#  The specialty resource is produced by the KingdomsX extractors (the          #
+#  "extractor" structure). This addon adds no block of its own: when a member   #
+#  collects an extractor, they receive its usual resource points AND the unique #
+#  resource of their kingdom's specialty.                                       #
 #                                                                              #
-#  Un extracteur sans carburant ne genere aucun point de ressource, donc aucune #
-#  ressource de specialite non plus. La quantite de carburant, la cadence et le #
-#  rendement des extracteurs se reglent dans Structures/extractor.yml.          #
+#  An extractor with no fuel generates no resource point, hence no specialty    #
+#  resource either. Fuel, rate and yield are configured on the KingdomsX side,  #
+#  in Structures/extractor.yml.                                                 #
 # ============================================================================ #
 extraction:
-  # Points de ressources generes par l'extracteur pour produire une unite
-  # de la ressource de specialite.
+  # Resource points an extractor has to generate for one unit of the
+  # specialty resource to be produced.
   resource-points-per-unit: 100
 
-  # Multiplicateur applique a la quantite produite. Expression mathematique
-  # evaluee avec le contexte du royaume (kingdoms_level, kingdoms_members...).
+  # Multiplier applied to the produced amount. A math expression, evaluated
+  # with the kingdom's context (kingdoms_level, kingdoms_members...).
   multiplier: '1'
 
-  # Quantite maximale produite par collecte. 0 = illimite.
+  # Largest amount produced by a single collect. 0 = no limit.
   max-per-collect: 0
 
-  # Reporter le reliquat non converti sur la collecte suivante, au lieu de le
-  # perdre. Sans cela, collecter souvent de petites quantites ne produit jamais
-  # rien.
+  # Carry what could not be converted over to the next collect instead of
+  # losing it. Without this, collecting small amounts often would never produce
+  # anything at all.
   carry-over-remainder: true
 
-  # Si l'inventaire du collecteur est plein, faire tomber les objets a ses pieds.
-  # Sinon, le surplus est reporte sur la collecte suivante.
+  # When the collector's inventory is full, drop the items at their feet.
+  # Otherwise the surplus is carried over to the next collect.
   drop-if-inventory-full: true
 
 # ============================================================================ #
-#                              LES 3 SPECIALITES                                #
+#                             THE 3 SPECIALTIES                                 #
 #                                                                              #
-#  Les cles doivent rester : weaponsmith, armorer, alchemist                    #
+#  The keys must stay: weaponsmith, armorer, alchemist                          #
 #                                                                              #
-#  Tout se fabrique a la Forge de Specialite (Structures/specialty-forge.yml),  #
-#  jamais a l'etabli. Les ingredients sont pris dans l'inventaire du joueur.    #
+#  Everything is made at the Specialty Forge                                    #
+#  (Structures/specialty-forge.yml), never at a crafting table. Ingredients     #
+#  are taken from the player's inventory.                                       #
 #                                                                              #
-#  Types de recette :                                                           #
-#    SHAPED     : 'shape' (1 a 3 lignes) + 'ingredients' (lettre -> materiau).  #
-#                 La forge n'a pas de grille : la forme sert uniquement a       #
-#                 compter combien d'exemplaires de chaque ingredient il faut.   #
-#    SHAPELESS  : 'ingredients' est une liste ; repeter une entree en demande   #
-#                 plusieurs.                                                    #
-#    TRANSMUTE  : comme SHAPELESS, mais un ingredient supplementaire - la       #
-#                 'source' - est une potion dont l'effet est REPRIS par le      #
-#                 resultat. La duree et le niveau ne sont pas ecrits ici : ils  #
-#                 sont lus sur la fiole apportee par le joueur. C'est ce qui    #
-#                 permet a une potion de poison de devenir une potion de wither #
-#                 de la meme duree et du meme niveau, quelle que soit la fiole. #
+#  Recipe types:                                                                #
+#    SHAPED     : 'shape' (1 to 3 rows) + 'ingredients' (letter -> material).   #
+#                 The forge has no crafting grid: a shape is only read to count #
+#                 how many of each ingredient the recipe needs.                 #
+#    SHAPELESS  : 'ingredients' is a list; repeating an entry asks for more.    #
+#    TRANSMUTE  : like SHAPELESS, but one further ingredient - the 'source' -   #
+#                 is a potion whose effect is CARRIED OVER to the result. The   #
+#                 duration and the level are not written here: they are read    #
+#                 off the bottle the player brought. That is what turns a       #
+#                 poison potion into a wither potion of the very same duration  #
+#                 and level, whichever bottle it was.                           #
 #                                                                              #
-#  Les noms d'effets et d'attributs acceptent toutes leurs orthographes :       #
-#  STRENGTH comme INCREASE_DAMAGE, ARMOR comme GENERIC_ARMOR. XSeries fait la   #
-#  correspondance avec ce que la version du serveur utilise vraiment.           #
+#  Effect and attribute names accept every spelling they ever had: STRENGTH as  #
+#  well as INCREASE_DAMAGE, ARMOR as well as GENERIC_ARMOR. XSeries maps them   #
+#  onto whatever the running server calls them.                                 #
 #                                                                              #
-#  '@resource' designe la ressource unique de la specialite.                    #
+#  '@resource' stands for the unique resource of the specialty.                 #
 #                                                                              #
 #  ---------------------------------------------------------------------------  #
-#  Un objet ('result' ou 'resource') se decrit avec LA MEME SYNTAXE que         #
-#  n'importe quel objet de KingdomsX : c'est son deserialiseur qui est appele.  #
-#  Donc material / amount / name / lore / enchants / stored-enchants / flags /  #
+#  An item ('result' or 'resource') is described with THE VERY SYNTAX of any    #
+#  KingdomsX item: it is the main plugin's own deserializer that reads it. So   #
+#  material / amount / name / lore / enchants / stored-enchants / flags /       #
 #  attributes / effects / color / custom-model-data / unbreakable / glow /      #
-#  damage / skull / trim / item-model / nbt ... voyez les fichiers du plugin    #
-#  principal pour la liste complete.                                            #
+#  damage / skull / trim / item-model / nbt ... see the files of the main       #
+#  plugin for the full list.                                                    #
 #                                                                              #
-#  Deux options en plus, propres a l'extension :                                #
+#  Two further options belong to this addon:                                    #
 #                                                                              #
-#    glint : le reflet enchante par le composant prevu pour ca (1.20.5+).       #
-#            A preferer a 'glow', qui obtient le meme reflet avec un            #
-#            enchantement masque - et donne donc une Solidite I bien reelle a   #
-#            l'objet, ce qui casse le "memes caracteristiques que la netherite".#
+#    glint : the enchanted shimmer through the component made for it (1.20.5+). #
+#            Prefer it over 'glow', which gets the same shimmer out of a hidden #
+#            enchantment - and so hands the item a very real Unbreaking I,      #
+#            which breaks "the same stats as netherite".                        #
 #                                                                              #
-#    consume-effects : ce qu'un ALIMENT donne quand il est mange. Les effets    #
-#            d'une pomme d'or sont codes en dur dans le jeu et ne s'editent     #
-#            pas : ils sont appliques par l'extension a la consommation, juste  #
-#            avant ceux du jeu, qui ne peuvent alors plus les affaiblir.        #
-#            Meme forme que 'effects' :  'EFFET, secondes, niveau'              #
-#            Le niveau part de 1 :  'ABSORPTION, 120, 2'  =  Absorption II      #
-#            pendant deux minutes.                                              #
+#    consume-effects : what a FOOD item hands out when eaten. A golden apple's  #
+#            effects are hardcoded in the game and cannot be edited: the addon  #
+#            applies these itself when the item is consumed, just before the    #
+#            game applies its own, which can then no longer weaken them.        #
+#            Same shape as 'effects':  'EFFECT, seconds, level'                 #
+#            The level starts at 1:  'ABSORPTION, 120, 2'  =  Absorption II     #
+#            for two minutes.                                                   #
 #  ---------------------------------------------------------------------------  #
 #                                                                              #
-#  'attributes' remplace les statistiques de base de l'objet : c'est ce qui     #
-#  permet de depasser reellement la netherite. Quand vous en definissez un sur  #
-#  une arme ou une armure, precisez TOUTES les statistiques voulues, car celles #
-#  d'origine ne s'appliquent plus - la portee d'une lance comprise.             #
+#  'attributes' replaces the item's base stats: that is what makes it possible  #
+#  to genuinely outclass netherite. Whenever you define one on a weapon or a    #
+#  piece of armor, spell out EVERY stat you want, because the original ones no  #
+#  longer apply - a spear's reach included.                                     #
 #                                                                              #
-#  Le 'name' d'un attribut est l'identifiant du modificateur. Sans lui, XSeries #
-#  en tire un UUID au hasard : l'objet cesse d'etre identique d'un demarrage a  #
-#  l'autre. Donnez-en un, en minuscules, forme 'namespace:cle'.                 #
-#  Reperes vanilla (valeur affichee dans l'infobulle entre parentheses) :       #
-#    epee netherite      = 7 (8) degats   / -2.4 (1.6) vitesse                  #
-#    hache netherite     = 9 (10) degats  / -3.0 (1.0) vitesse                  #
-#    lance netherite     = 4 (5) degats   / -3.13 (0.87) vitesse                #
-#    casque netherite    = 3 armure / 3 resistance / 0.1 resistance au recul    #
-#    plastron netherite  = 8 armure / 3 resistance / 0.1 resistance au recul    #
-#    jambieres netherite = 6 armure / 3 resistance / 0.1 resistance au recul    #
-#    bottes netherite    = 3 armure / 3 resistance / 0.1 resistance au recul    #
+#  An attribute's 'name' is the modifier's identifier. Without one, XSeries     #
+#  makes up a random UUID and the item stops being the same from one restart to #
+#  the next. Give it one, lower case, in 'namespace:key' form.                  #
+#                                                                              #
+#  Vanilla figures (the tooltip value in brackets):                             #
+#    netherite sword      = 7 (8) damage   / -2.4 (1.6) attack speed            #
+#    netherite axe        = 9 (10) damage  / -3.0 (1.0) attack speed            #
+#    netherite spear      = 4 (5) damage   / -3.13 (0.87) attack speed          #
+#    netherite helmet     = 3 armor / 3 toughness / 0.1 knockback resistance    #
+#    netherite chestplate = 8 armor / 3 toughness / 0.1 knockback resistance    #
+#    netherite leggings   = 6 armor / 3 toughness / 0.1 knockback resistance    #
+#    netherite boots      = 3 armor / 3 toughness / 0.1 knockback resistance    #
 # ============================================================================ #
 specialties:
 
-  # ---------------------------------------------------------------- ARMES ----
-  #  Ressource : le Carbone. Il forge l'epee, la hache et la lance.
-  #  Les objets gardent le visuel et les caracteristiques de la netherite,
-  #  a une difference pres : +2 degats d'attaque.
+  # -------------------------------------------------------------- WEAPONS ----
+  #  Resource: Carbon. It forges the sword, the axe and the spear.
+  #  The items keep the look and the stats of netherite, with one difference:
+  #  +2 attack damage.
   weaponsmith:
-    display-name: '&c&lForgeron de Guerre'
+    display-name: '&c&lWarsmith'
     icon: NETHERITE_SWORD
     description:
-      - '&7Vos forges ne battent que pour la guerre.'
-      - '&7Ressource unique&8: &8&lCarbone'
-      - '&7Debloque&8: &fles armes de carbone &8(&f+2 degats&8)'
+      - '&7Your forges beat for war and nothing else.'
+      - '&7Unique resource&8: &8&lCarbon'
+      - '&7Unlocks&8: &fcarbon weapons &8(&f+2 damage&8)'
 
     resource:
       material: COAL
-      name: '&8&lCarbone'
+      name: '&8&lCarbon'
       glint: true
       lore:
-        - '&8Ressource de specialite'
-        - '&7Extrait par les forgerons du royaume.'
+        - '&8Specialty resource'
+        - '&7Drawn out by the smiths of the kingdom.'
 
     recipes:
-      epee-de-carbone:
+      carbon-sword:
         type: SHAPELESS
-        display-name: '&8&lEpee de Carbone'
+        display-name: '&8&lCarbon Sword'
         description:
-          - '&7Une epee de netherite, &f+2 &7degats&8:'
-          - '&f10 &7degats contre &f8&7.'
+          - '&7A netherite sword, &f+2 &7damage&8:'
+          - '&f10 &7damage against &f8&7.'
         ingredients:
           - NETHERITE_SWORD
           - '@resource'
@@ -199,28 +198,28 @@ specialties:
           - '@resource'
         result:
           material: NETHERITE_SWORD
-          name: '&8&lEpee de Carbone'
+          name: '&8&lCarbon Sword'
           glint: true
           lore:
-            - '&7Trempee dans le carbone du royaume.'
+            - '&7Tempered in the carbon of the kingdom.'
           attributes:
             ATTACK_DAMAGE:
-              name: specialties:epee-de-carbone-attack-damage
+              name: specialties:carbon-sword-attack-damage
               amount: 9
               operation: ADD_NUMBER
               slot: HAND
             ATTACK_SPEED:
-              name: specialties:epee-de-carbone-attack-speed
+              name: specialties:carbon-sword-attack-speed
               amount: -2.4
               operation: ADD_NUMBER
               slot: HAND
 
-      hache-de-carbone:
+      carbon-axe:
         type: SHAPELESS
-        display-name: '&8&lHache de Carbone'
+        display-name: '&8&lCarbon Axe'
         description:
-          - '&7Une hache de netherite, &f+2 &7degats&8:'
-          - '&f12 &7degats contre &f10&7.'
+          - '&7A netherite axe, &f+2 &7damage&8:'
+          - '&f12 &7damage against &f10&7.'
         ingredients:
           - NETHERITE_AXE
           - '@resource'
@@ -229,35 +228,35 @@ specialties:
           - '@resource'
         result:
           material: NETHERITE_AXE
-          name: '&8&lHache de Carbone'
+          name: '&8&lCarbon Axe'
           glint: true
           lore:
-            - '&7Trempee dans le carbone du royaume.'
+            - '&7Tempered in the carbon of the kingdom.'
           attributes:
             ATTACK_DAMAGE:
-              name: specialties:hache-de-carbone-attack-damage
+              name: specialties:carbon-axe-attack-damage
               amount: 11
               operation: ADD_NUMBER
               slot: HAND
             ATTACK_SPEED:
-              name: specialties:hache-de-carbone-attack-speed
+              name: specialties:carbon-axe-attack-speed
               amount: -3.0
               operation: ADD_NUMBER
               slot: HAND
 
-      # La lance existe depuis la 1.21.11. Sur un serveur plus ancien, le
-      # materiau est inconnu : la recette est ignoree avec un avertissement
-      # dans la console, le reste de la specialite fonctionne normalement.
+      # Spears exist since 1.21.11. On an older server the material is unknown:
+      # the recipe is skipped with a message in the console, and the rest of the
+      # specialty works as usual.
       #
-      # ENTITY_INTERACTION_RANGE est la portee de la lance : elle vient d'un
-      # attribut, que definir 'attributes' remettrait a zero. Elle est donc
-      # redeclaree ici, comme les degats et la vitesse.
-      lance-de-carbone:
+      # ENTITY_INTERACTION_RANGE is the spear's reach: it comes from an
+      # attribute, which defining 'attributes' would wipe. So it is declared
+      # again here, alongside the damage and the attack speed.
+      carbon-spear:
         type: SHAPELESS
-        display-name: '&8&lLance de Carbone'
+        display-name: '&8&lCarbon Spear'
         description:
-          - '&7Une lance de netherite, &f+2 &7degats&8:'
-          - '&f7 &7degats contre &f5&7.'
+          - '&7A netherite spear, &f+2 &7damage&8:'
+          - '&f7 &7damage against &f5&7.'
         ingredients:
           - NETHERITE_SPEAR
           - '@resource'
@@ -266,54 +265,54 @@ specialties:
           - '@resource'
         result:
           material: NETHERITE_SPEAR
-          name: '&8&lLance de Carbone'
+          name: '&8&lCarbon Spear'
           glint: true
           lore:
-            - '&7Trempee dans le carbone du royaume.'
+            - '&7Tempered in the carbon of the kingdom.'
           attributes:
             ATTACK_DAMAGE:
-              name: specialties:lance-de-carbone-attack-damage
+              name: specialties:carbon-spear-attack-damage
               amount: 6
               operation: ADD_NUMBER
               slot: HAND
             ATTACK_SPEED:
-              name: specialties:lance-de-carbone-attack-speed
+              name: specialties:carbon-spear-attack-speed
               amount: -3.13
               operation: ADD_NUMBER
               slot: HAND
             ENTITY_INTERACTION_RANGE:
-              name: specialties:lance-de-carbone-entity-interaction-range
+              name: specialties:carbon-spear-entity-interaction-range
               amount: 1.5
               operation: ADD_NUMBER
               slot: HAND
 
-  # -------------------------------------------------------------- ARMURES ----
-  #  Ressource : le Mitril. Il forge les quatre pieces d'armure.
-  #  Les objets gardent le visuel et les caracteristiques de la netherite,
-  #  a deux differences pres : +2 d'armure et +1 de resistance.
+  # ---------------------------------------------------------------- ARMOR ----
+  #  Resource: Mithril. It forges the four pieces of armor.
+  #  The items keep the look and the stats of netherite, with two differences:
+  #  +2 armor and +1 armor toughness.
   armorer:
-    display-name: '&b&lArmurier Royal'
+    display-name: '&b&lRoyal Armorer'
     icon: NETHERITE_CHESTPLATE
     description:
-      - '&7Nul ne perce vos lignes.'
-      - '&7Ressource unique&8: &bMitril'
-      - '&7Debloque&8: &fles armures de mitril &8(&f+2 armure, +1 resistance&8)'
+      - '&7No one breaks your lines.'
+      - '&7Unique resource&8: &bMithril'
+      - '&7Unlocks&8: &fmithril armor &8(&f+2 armor, +1 toughness&8)'
 
     resource:
       material: IRON_INGOT
-      name: '&b&lMitril'
+      name: '&b&lMithril'
       glint: true
       lore:
-        - '&8Ressource de specialite'
-        - '&7Martele par les armuriers du royaume.'
+        - '&8Specialty resource'
+        - '&7Hammered out by the armorers of the kingdom.'
 
     recipes:
-      casque-de-mitril:
+      mithril-helmet:
         type: SHAPELESS
-        display-name: '&b&lCasque de Mitril'
+        display-name: '&b&lMithril Helmet'
         description:
-          - '&f5 &7armure contre &f3&7,'
-          - '&f4 &7de resistance contre &f3&7.'
+          - '&f5 &7armor against &f3&7,'
+          - '&f4 &7toughness against &f3&7.'
         ingredients:
           - NETHERITE_HELMET
           - '@resource'
@@ -322,33 +321,33 @@ specialties:
           - '@resource'
         result:
           material: NETHERITE_HELMET
-          name: '&b&lCasque de Mitril'
+          name: '&b&lMithril Helmet'
           glint: true
           lore:
-            - '&7Martele dans le mitril du royaume.'
+            - '&7Hammered from the mithril of the kingdom.'
           attributes:
             ARMOR:
-              name: specialties:casque-de-mitril-armor
+              name: specialties:mithril-helmet-armor
               amount: 5
               operation: ADD_NUMBER
               slot: HEAD
             ARMOR_TOUGHNESS:
-              name: specialties:casque-de-mitril-armor-toughness
+              name: specialties:mithril-helmet-armor-toughness
               amount: 4
               operation: ADD_NUMBER
               slot: HEAD
             KNOCKBACK_RESISTANCE:
-              name: specialties:casque-de-mitril-knockback-resistance
+              name: specialties:mithril-helmet-knockback-resistance
               amount: 0.1
               operation: ADD_NUMBER
               slot: HEAD
 
-      plastron-de-mitril:
+      mithril-chestplate:
         type: SHAPELESS
-        display-name: '&b&lPlastron de Mitril'
+        display-name: '&b&lMithril Chestplate'
         description:
-          - '&f10 &7armure contre &f8&7,'
-          - '&f4 &7de resistance contre &f3&7.'
+          - '&f10 &7armor against &f8&7,'
+          - '&f4 &7toughness against &f3&7.'
         ingredients:
           - NETHERITE_CHESTPLATE
           - '@resource'
@@ -357,33 +356,33 @@ specialties:
           - '@resource'
         result:
           material: NETHERITE_CHESTPLATE
-          name: '&b&lPlastron de Mitril'
+          name: '&b&lMithril Chestplate'
           glint: true
           lore:
-            - '&7Martele dans le mitril du royaume.'
+            - '&7Hammered from the mithril of the kingdom.'
           attributes:
             ARMOR:
-              name: specialties:plastron-de-mitril-armor
+              name: specialties:mithril-chestplate-armor
               amount: 10
               operation: ADD_NUMBER
               slot: CHEST
             ARMOR_TOUGHNESS:
-              name: specialties:plastron-de-mitril-armor-toughness
+              name: specialties:mithril-chestplate-armor-toughness
               amount: 4
               operation: ADD_NUMBER
               slot: CHEST
             KNOCKBACK_RESISTANCE:
-              name: specialties:plastron-de-mitril-knockback-resistance
+              name: specialties:mithril-chestplate-knockback-resistance
               amount: 0.1
               operation: ADD_NUMBER
               slot: CHEST
 
-      pantalon-de-mitril:
+      mithril-leggings:
         type: SHAPELESS
-        display-name: '&b&lPantalon de Mitril'
+        display-name: '&b&lMithril Leggings'
         description:
-          - '&f8 &7armure contre &f6&7,'
-          - '&f4 &7de resistance contre &f3&7.'
+          - '&f8 &7armor against &f6&7,'
+          - '&f4 &7toughness against &f3&7.'
         ingredients:
           - NETHERITE_LEGGINGS
           - '@resource'
@@ -392,33 +391,33 @@ specialties:
           - '@resource'
         result:
           material: NETHERITE_LEGGINGS
-          name: '&b&lPantalon de Mitril'
+          name: '&b&lMithril Leggings'
           glint: true
           lore:
-            - '&7Martele dans le mitril du royaume.'
+            - '&7Hammered from the mithril of the kingdom.'
           attributes:
             ARMOR:
-              name: specialties:pantalon-de-mitril-armor
+              name: specialties:mithril-leggings-armor
               amount: 8
               operation: ADD_NUMBER
               slot: LEGS
             ARMOR_TOUGHNESS:
-              name: specialties:pantalon-de-mitril-armor-toughness
+              name: specialties:mithril-leggings-armor-toughness
               amount: 4
               operation: ADD_NUMBER
               slot: LEGS
             KNOCKBACK_RESISTANCE:
-              name: specialties:pantalon-de-mitril-knockback-resistance
+              name: specialties:mithril-leggings-knockback-resistance
               amount: 0.1
               operation: ADD_NUMBER
               slot: LEGS
 
-      bottes-de-mitril:
+      mithril-boots:
         type: SHAPELESS
-        display-name: '&b&lBottes de Mitril'
+        display-name: '&b&lMithril Boots'
         description:
-          - '&f5 &7armure contre &f3&7,'
-          - '&f4 &7de resistance contre &f3&7.'
+          - '&f5 &7armor against &f3&7,'
+          - '&f4 &7toughness against &f3&7.'
         ingredients:
           - NETHERITE_BOOTS
           - '@resource'
@@ -427,61 +426,61 @@ specialties:
           - '@resource'
         result:
           material: NETHERITE_BOOTS
-          name: '&b&lBottes de Mitril'
+          name: '&b&lMithril Boots'
           glint: true
           lore:
-            - '&7Martelees dans le mitril du royaume.'
+            - '&7Hammered from the mithril of the kingdom.'
           attributes:
             ARMOR:
-              name: specialties:bottes-de-mitril-armor
+              name: specialties:mithril-boots-armor
               amount: 5
               operation: ADD_NUMBER
               slot: FEET
             ARMOR_TOUGHNESS:
-              name: specialties:bottes-de-mitril-armor-toughness
+              name: specialties:mithril-boots-armor-toughness
               amount: 4
               operation: ADD_NUMBER
               slot: FEET
             KNOCKBACK_RESISTANCE:
-              name: specialties:bottes-de-mitril-knockback-resistance
+              name: specialties:mithril-boots-knockback-resistance
               amount: 0.1
               operation: ADD_NUMBER
               slot: FEET
 
-  # ---------------------------------------------------- POTIONS ET NOURRITURE -
-  #  Ressource : le Goo. Il transforme un objet existant en sa version sublimee,
-  #  qui garde son visuel d'origine et gagne le reflet enchante.
+  # ----------------------------------------------------- POTIONS AND FOOD ----
+  #  Resource: Goo. It turns an existing item into its sublimated version,
+  #  which keeps its original look and gains the enchanted shimmer.
   alchemist:
-    display-name: '&d&lAlchimiste'
+    display-name: '&d&lAlchemist'
     icon: BREWING_STAND
     description:
-      - '&7Vos fioles valent des armees.'
-      - '&7Ressource unique&8: &aGoo'
-      - '&7Debloque&8: &fles potions et les vivres sublimes'
+      - '&7Your vials are worth armies.'
+      - '&7Unique resource&8: &aGoo'
+      - '&7Unlocks&8: &fsublimated potions and provisions'
 
     resource:
       material: SLIME_BALL
       name: '&a&lGoo'
       glint: true
       lore:
-        - '&8Ressource de specialite'
-        - '&7Distille par les alchimistes du royaume.'
+        - '&8Specialty resource'
+        - '&7Distilled by the alchemists of the kingdom.'
 
     recipes:
-      # Potion de poison + Goo = potion de wither.
-      # La duree et le niveau sont repris de la fiole consommee : un poison
-      # allonge donne un wither allonge, un poison II donne un wither II.
-      potion-de-wither:
+      # Poison potion + Goo = wither potion.
+      # The duration and the level are carried over from the bottle that was
+      # used: a long poison gives a long wither, a poison II gives a wither II.
+      wither-potion:
         type: TRANSMUTE
-        display-name: '&8&lPotion de Wither'
+        display-name: '&8&lPotion of Withering'
         icon: POTION
         description:
-          - '&7Le poison vire au fletrissement.'
-          - '&8Meme duree et meme niveau que la fiole utilisee.'
+          - '&7Poison turns to withering.'
+          - '&8Same duration and level as the bottle used.'
         source:
           material: POTION
           effect: POISON
-          name: '&2Potion de Poison'
+          name: '&2Potion of Poison'
         ingredients:
           - '@resource'
         transmute:
@@ -489,27 +488,27 @@ specialties:
           amplifier-shift: 0
         result:
           material: POTION
-          name: '&8&lPotion de Wither'
+          name: '&8&lPotion of Withering'
           glint: true
           color: '#3b3b3b'
           lore:
-            - '&7Sublimee au goo du royaume.'
+            - '&7Sublimated with the goo of the kingdom.'
 
-      # Potion de force II + Goo = potion de force III, meme duree.
-      # 'amplifier: 1' vise la force II exactement : sans cela, la force III
-      # produite ici pourrait a son tour etre transmutee en force IV.
-      potion-de-force-iii:
+      # Strength II potion + Goo = strength III potion, same duration.
+      # 'amplifier: 1' aims at strength II exactly: without it, the strength III
+      # made here could in turn be transmuted into a strength IV.
+      strength-iii-potion:
         type: TRANSMUTE
-        display-name: '&4&lPotion de Force III'
+        display-name: '&4&lPotion of Strength III'
         icon: POTION
         description:
-          - '&7Un cran au-dessus de la force II.'
-          - '&8Meme duree que la fiole utilisee.'
+          - '&7One notch above strength II.'
+          - '&8Same duration as the bottle used.'
         source:
           material: POTION
           effect: STRENGTH
           amplifier: 1
-          name: '&4Potion de Force II'
+          name: '&4Potion of Strength II'
         ingredients:
           - '@resource'
         transmute:
@@ -517,31 +516,31 @@ specialties:
           amplifier-shift: 1
         result:
           material: POTION
-          name: '&4&lPotion de Force III'
+          name: '&4&lPotion of Strength III'
           glint: true
           color: '#c02020'
           lore:
-            - '&7Sublimee au goo du royaume.'
+            - '&7Sublimated with the goo of the kingdom.'
 
-      # Pomme d'or + Goo = pomme d'or sublimee.
-      # Absorption II et Regeneration IV, contre I et II pour la pomme normale.
-      # Les effets d'un aliment ne s'editent pas : ils sont appliques par
-      # l'extension a la consommation, voir 'consume-effects' plus haut.
-      pomme-d-or-sublimee:
+      # Golden apple + Goo = sublimated golden apple.
+      # Absorption II and Regeneration IV, against I and II for the plain one.
+      # A food item's effects cannot be edited: they are applied by the addon
+      # when it is consumed, see 'consume-effects' above.
+      sublimated-golden-apple:
         type: SHAPELESS
-        display-name: '&6&lPomme d Or Sublimee'
+        display-name: '&6&lSublimated Golden Apple'
         description:
-          - '&7Absorption &fII &7contre &fI&7,'
-          - '&7Regeneration &fIV &7contre &fII&7.'
+          - '&7Absorption &fII &7against &fI&7,'
+          - '&7Regeneration &fIV &7against &fII&7.'
         ingredients:
           - GOLDEN_APPLE
           - '@resource'
         result:
           material: GOLDEN_APPLE
-          name: '&6&lPomme d Or Sublimee'
+          name: '&6&lSublimated Golden Apple'
           glint: true
           lore:
-            - '&7Sublimee au goo du royaume.'
+            - '&7Sublimated with the goo of the kingdom.'
           consume-effects:
             - 'ABSORPTION, 120, 2'
             - 'REGENERATION, 5, 4'

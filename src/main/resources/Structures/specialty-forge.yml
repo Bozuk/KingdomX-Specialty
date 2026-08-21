@@ -1,12 +1,12 @@
 # ============================================================================ #
-#                          Forge de Specialite                                  #
+#                             Specialty Forge                                   #
 #                                                                              #
-#  Structure ajoutee par l'extension Specialties. Elle apparait dans la liste   #
-#  des structures du royaume (/k structures) et se construit comme les autres.  #
-#  Son menu permet de fabriquer les objets de la specialite du royaume.         #
+#  The structure this addon adds. It shows up in the kingdom's structure list   #
+#  (/k structures) and is built like any other. Its menu is where the items of  #
+#  the kingdom's specialty are made.                                            #
 #                                                                              #
-#  Le champ 'type' doit rester 'specialty-forge' : c'est lui qui relie ce       #
-#  fichier au code de l'extension.                                              #
+#  The 'type' field must stay 'specialty-forge': that is what ties this file    #
+#  to the addon's code.                                                         #
 # ============================================================================ #
 (import):
   structure:
@@ -18,9 +18,9 @@
       <material-2>: SMITHING_TABLE
       <material-3>: SMITHING_TABLE
 
-name: "{$p}Forge de Specialite"
+name: "{$p}Specialty Forge"
 type: specialty-forge
-default-name: 'Forge de Specialite'
+default-name: 'Specialty Forge'
 
 max-level: 1
 upgrade-cost: lvl * 1000
@@ -34,15 +34,15 @@ sell: 1500
 
 item:
   1:
-    name: "{$p}Forge de Specialite"
+    name: "{$p}Specialty Forge"
     material: SMITHING_TABLE
     lore: |
-      {$s}Le seul endroit ou fabriquer les
-      {$s}objets de la specialite du royaume.
+      {$s}The only place the items of the
+      {$s}kingdom's specialty can be made.
 
-      {$dot} {$p}Armes {$sep}de carbone, au-dela de la netherite
-      {$dot} {$p}Armures {$sep}de mitril, au-dela de la netherite
-      {$dot} {$p}Potions et vivres {$sep}sublimes au goo
+      {$dot} {$p}Carbon weapons {$sep}beyond netherite
+      {$dot} {$p}Mithril armor {$sep}beyond netherite
+      {$dot} {$p}Potions and provisions {$sep}sublimated with goo
 
-      {$sep}Le contenu du menu depend de la
-      {$sep}specialite choisie par le royaume.
+      {$sep}What the menu holds depends on the
+      {$sep}specialty the kingdom picked.
