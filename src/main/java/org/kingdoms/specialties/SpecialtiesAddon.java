@@ -21,6 +21,7 @@ import org.kingdoms.specialties.managers.ConsumeListener;
 import org.kingdoms.specialties.managers.ExtractionListener;
 import org.kingdoms.specialties.locale.SpecialtiesLanguages;
 import org.kingdoms.specialties.managers.KingdomCreationListener;
+import org.kingdoms.specialties.structure.NexusMenuInstaller;
 import org.kingdoms.specialties.structure.SpecialtyForgeStructureType;
 import org.kingdoms.specialties.structure.StructureInstaller;
 
@@ -81,6 +82,10 @@ public final class SpecialtiesAddon extends JavaPlugin implements Addon {
 
         Specialty.reload();
         if (!structureInstalled) StructureInstaller.installLate();
+        NexusMenuInstaller.verifyRegistered();
+
+        // The structure shop lists what its own GUI file names, not what the registry holds.
+        NexusMenuInstaller.install();
 
         Bukkit.getPluginManager().registerEvents(new ExtractionListener(), this);
         Bukkit.getPluginManager().registerEvents(new KingdomCreationListener(), this);

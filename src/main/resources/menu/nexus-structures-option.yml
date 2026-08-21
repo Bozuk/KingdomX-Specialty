@@ -1,0 +1,30 @@
+# ============================================================================ #
+#  Entree ajoutee au menu d'achat des structures (nexus > Structures) par       #
+#  l'extension Specialties.                                                     #
+#                                                                              #
+#  KingdomsX ne construit pas ce menu tout seul : il parcourt les structures    #
+#  enregistrees et, pour chacune, cherche une option DU MEME NOM dans le        #
+#  fichier du menu. Une structure sans entree ici est simplement ignoree, sans  #
+#  aucun message. C'est pourquoi l'extension ajoute la sienne au demarrage.     #
+#                                                                              #
+#  Une fois ecrite, cette entree vous appartient : deplacez-la, renommez-la ou  #
+#  changez son icone comme n'importe quelle autre. L'extension ne la reecrit    #
+#  jamais. La supprimer retire la forge du menu d'achat.                        #
+# ============================================================================ #
+specialty-forge:
+  name: "{$p}Forge de Specialite"
+  material: SMITHING_TABLE
+  sound: BLOCK_ANVIL_USE
+  lore: |
+    {$s}Le seul endroit ou fabriquer les
+    {$s}objets de la specialite du royaume.
+
+    {$dot} {$p}Armes {$sep}de carbone, au-dela de la netherite
+    {$dot} {$p}Armures {$sep}de mitril, au-dela de la netherite
+    {$dot} {$p}Potions et vivres {$sep}sublimes au goo
+
+    {$sep}Le contenu du menu depend de la
+    {$sep}specialite choisie par le royaume.
+
+    {$p}Cout{$colon} {$s}%fancy@cost%
+  slot: %slot%

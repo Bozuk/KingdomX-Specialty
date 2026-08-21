@@ -25,7 +25,7 @@ public final class ForgeGUI {
     private ForgeGUI() {}
 
     public static InteractiveGUI open(KingdomBuildingGUIContext<Structure> context) {
-        Structure structure = context.getEvent().getKingdomItem();
+        Structure structure = context.getEvent().getBuilding();
         Player player = context.getEvent().getPlayer().getPlayer();
         if (player == null) return null;
 

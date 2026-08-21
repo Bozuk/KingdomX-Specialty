@@ -27,9 +27,22 @@ de carbone reste une épée de netherite — avec en plus le reflet enchanté et
    - `plugins/Kingdoms/specialties.yml` — la configuration ;
    - `plugins/Kingdoms/specialties/languages/<code>.yml` — un fichier de messages par langue ;
    - `plugins/Kingdoms/Structures/specialty-forge.yml` — la structure ;
-   - les menus dans les dossiers GUI de KingdomsX.
+   - les menus dans les dossiers GUI de KingdomsX ;
+   - une entrée `specialty-forge` dans `guis/<langue>/structures/nexus/structures.yml`, le menu
+     d'achat des structures — sans elle la forge n'y apparaît pas (voir les notes techniques).
 
-Prérequis : Minecraft **1.16+**, KingdomsX **1.17.18.1-BETA** ou plus récent. Folia est supporté.
+Prérequis : Minecraft **1.16+**, KingdomsX **1.17.27.3**. Folia est supporté.
+
+**Recompilez à chaque montée de version de KingdomsX, avant de déployer.** Les signatures bougent
+réellement : 1.17.27.3 a renommé `KingdomItemInteractEvent` en `KingdomBuildingInteractEvent` et
+`getKingdomItem()` en `getBuilding()`, ce qui donne un `NoSuchMethodError` à l'ouverture de la forge
+si l'extension a été compilée contre une version antérieure. La compilation est le moyen le plus
+rapide de trouver ces ruptures. Maven Central s'arrête à 1.17.18.1-BETA, donc installez le jar de
+votre serveur — c'est aussi la référence la plus fidèle :
+
+```bash
+mvn install:install-file -Dfile=<serveur>/plugins/KingdomsX-1.17.27.3.jar -DgroupId=com.github.cryptomorin -DartifactId=kingdoms -Dversion=1.17.27.3 -Dpackaging=jar
+```
 
 La **lance** (`NETHERITE_SPEAR`) n'existe que depuis la **1.21.11**. Sur un serveur plus ancien, sa
 recette est ignorée avec un avertissement dans la console ; les deux autres armes fonctionnent
@@ -227,6 +240,13 @@ consommation, juste avant ceux du jeu, qui ne peuvent alors plus les affaiblir.
 - **Structure** — un `StructureType` enregistré dans le registre de KingdomsX. Le fichier
   `Structures/specialty-forge.yml` n'est écrit qu'après l'extraction des structures par défaut :
   créer ce dossier trop tôt empêcherait KingdomsX d'y déposer les siennes sur un serveur neuf.
+- **Menu d'achat** — enregistrer la structure ne suffit pas à la rendre achetable. KingdomsX
+  parcourt les structures du registre et, pour chacune, cherche une option **du même nom** dans
+  `guis/<langue>/structures/nexus/structures.yml` ; une structure sans entrée y est ignorée sans le
+  moindre message en console. L'extension ajoute donc la sienne au démarrage, une seule fois, dans
+  le menu de chaque langue installée, puis n'y retouche jamais : l'entrée devient une ligne de
+  configuration du serveur comme une autre, libre d'être déplacée, restylée ou supprimée. Le slot
+  est choisi parmi ceux que le menu n'utilise pas encore.
 - **Langues** — l'extension enregistre elle-même ses messages compilés pour chaque langue
   installée, en lisant son propre dossier. Les entrées manquantes retombent sur l'anglais du code,
   donc aucun message ne peut rester non résolu, même avec un fichier vide ou incomplet.
@@ -235,7 +255,10 @@ consommation, juste avant ceux du jeu, qui ne peuvent alors plus les affaiblir.
   modificateurs (`UUID + EquipmentSlot`, puis `NamespacedKey + EquipmentSlotGroup`). Les deux
   chemins sont tentés, et l'option est ignorée avec un avertissement si aucun ne convient.
 - **Reflet enchanté** — `glow` utilise le composant dédié quand le serveur l'a (1.20.5+), sinon
-  l'astuce habituelle d'une Solidité I masquée, qui elle change légèrement l'objet.
+  l'astuce habituelle d'une Solidité I masquée, qui elle change légèrement l'objet. Cette
+  Solidité est retrouvée par son nom, jamais par `Enchantment.DURABILITY` : la constante a disparu
+  quand l'enchantement est devenu `UNBREAKING`, et une référence en dur vers un champ que le
+  serveur n'a plus lève un `NoSuchFieldError` au moment où la ligne s'exécute.
 - **Lecture des potions** — la `source` d'une transmutation est reconnue à l'effet qu'elle porte,
   pas à son matériau : toutes les potions du jeu partagent `POTION`. La lecture passe par réflexion,
   1.20.5 ayant remplacé `getBasePotionData()` — un type plus les drapeaux *extended* / *upgraded* —

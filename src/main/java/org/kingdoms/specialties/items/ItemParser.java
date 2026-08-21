@@ -202,10 +202,17 @@ public final class ItemParser {
             // Server older than 1.20.5.
         }
 
-        if (meta.getEnchants().isEmpty()) {
-            meta.addEnchant(Enchantment.DURABILITY, 1, true);
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        }
+        if (!meta.getEnchants().isEmpty()) return;
+
+        // Looked up by name rather than through Enchantment.DURABILITY: that constant was dropped
+        // once the enchantment became UNBREAKING, and a field the server no longer has is a
+        // NoSuchFieldError the moment this line runs.
+        Enchantment glint = matchEnchantment("unbreaking");
+        if (glint == null) glint = matchEnchantment("durability");
+        if (glint == null) return;
+
+        meta.addEnchant(glint, 1, true);
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
     }
 
     /** Modifier ids must be usable as a NamespacedKey on modern servers. */
