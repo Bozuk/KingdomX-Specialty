@@ -19,7 +19,6 @@ import org.kingdoms.specialties.managers.ForgeService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /** The menu of the specialty forge: one clickable entry per recipe of the kingdom's specialty. */
 public final class ForgeGUI {
@@ -53,10 +52,7 @@ public final class ForgeGUI {
 
                     entries.editItem(item -> describe(item, player, recipe));
                     entries.onNormalClicks(() -> {
-                        boolean done = recipe.getType() == SpecialtyRecipe.Type.ENCHANT
-                                ? ForgeService.enchant(player, recipe)
-                                : ForgeService.craft(player, recipe);
-                        if (done) open(context.refresh(gui));
+                        if (ForgeService.craft(player, recipe)) open(context.refresh(gui));
                     });
                     entries.done();
                 }
@@ -76,15 +72,7 @@ public final class ForgeGUI {
 
         meta.setDisplayName(ForgeService.displayNameOf(recipe));
 
-        boolean enchanting = recipe.getType() == SpecialtyRecipe.Type.ENCHANT;
         List<String> lore = new ArrayList<>(recipe.getDescription());
-
-        if (enchanting) {
-            lore.add(SpecialtiesLang.FORGE_ENTRY_ENCHANTMENT.parse(player,
-                    "enchantment", prettify(recipe.getEnchantment().getKey().getKey()),
-                    "level", recipe.getLevel()));
-            lore.add(SpecialtiesLang.FORGE_ENTRY_BEYOND_VANILLA.parse(player));
-        }
 
         lore.add("");
         lore.add(SpecialtiesLang.FORGE_ENTRY_INGREDIENTS.parse(player));
@@ -105,7 +93,6 @@ public final class ForgeGUI {
         }
 
         lore.add("");
-        if (enchanting) lore.add(SpecialtiesLang.FORGE_ENTRY_HOLD_ITEM.parse(player));
         lore.add(affordable
                 ? SpecialtiesLang.FORGE_ENTRY_CLICK_TO_FORGE.parse(player)
                 : SpecialtiesLang.FORGE_ENTRY_MISSING.parse(player));
@@ -113,17 +100,5 @@ public final class ForgeGUI {
         meta.setLore(lore);
         item.setItemMeta(meta);
         return item;
-    }
-
-    /** {@code fire_aspect} -> {@code Fire Aspect}. */
-    private static String prettify(String key) {
-        StringBuilder builder = new StringBuilder(key.length());
-        for (String word : key.split("[_.]")) {
-            if (word.isEmpty()) continue;
-            if (builder.length() != 0) builder.append(' ');
-            builder.append(Character.toUpperCase(word.charAt(0)))
-                    .append(word.substring(1).toLowerCase(Locale.ENGLISH));
-        }
-        return builder.toString();
     }
 }

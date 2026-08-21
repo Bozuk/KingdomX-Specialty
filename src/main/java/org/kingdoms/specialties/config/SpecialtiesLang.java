@@ -77,18 +77,11 @@ public enum SpecialtiesLang implements DefinedMessenger {
     // ---------------------------------------------------------------- forge
     FORGE_MISSING_INGREDIENTS("{$e}You are missing ingredients for this recipe.", 1),
     FORGE_CRAFTED("{$p}Forged{$colon} {$s}%recipe%", 1),
-    FORGE_ENCHANTED("{$p}Enchantment applied{$colon} {$s}%recipe% {$sep}(level {$s}%level%{$sep})", 1),
-    FORGE_ENCHANT_NO_ITEM("{$e}Hold the item you want to enchant, then click.", 1, 2),
-    FORGE_ENCHANT_WRONG_ITEM("{$e}This enchantment does not apply to the item you are holding.", 1, 2),
-    FORGE_ENCHANT_ALREADY("{$e}That item already has this enchantment at level {$es}%level%{$e} or above.", 1, 2),
 
     // Lines the forge menu builds for every recipe entry.
-    FORGE_ENTRY_ENCHANTMENT("&7Enchantment &f%enchantment% &7level &e%level%", 1, 2),
-    FORGE_ENTRY_BEYOND_VANILLA("&8Beyond the vanilla cap", 1, 2),
     FORGE_ENTRY_INGREDIENTS("&7Required ingredients&8:", 1, 2),
     FORGE_ENTRY_INGREDIENT_OK("&a %owned%/%required% &7%ingredient%", 1, 2),
     FORGE_ENTRY_INGREDIENT_MISSING("&c %owned%/%required% &7%ingredient%", 1, 2),
-    FORGE_ENTRY_HOLD_ITEM("&7Hold the item in your hand, then click.", 1, 2),
     FORGE_ENTRY_CLICK_TO_FORGE("&aClick to forge.", 1, 2),
     FORGE_ENTRY_MISSING("&cMissing ingredients.", 1, 2),
     ;

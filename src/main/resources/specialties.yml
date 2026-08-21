@@ -1,7 +1,7 @@
 # ============================================================================ #
 #                        Kingdoms Addon - Specialties                          #
 #                                                                              #
-#  Chaque royaume choisit UNE specialite parmi 4, AU MOMENT DE SA CREATION :    #
+#  Chaque royaume choisit UNE specialite parmi 3, AU MOMENT DE SA CREATION :    #
 #  /k create <nom> ouvre le menu des specialites, et le royaume n'est fonde     #
 #  qu'une fois la specialite choisie. La specialite donne acces a une ressource #
 #  unique, produite par les extracteurs de KingdomsX, qui sert a fabriquer des  #
@@ -95,9 +95,9 @@ extraction:
   drop-if-inventory-full: true
 
 # ============================================================================ #
-#                              LES 4 SPECIALITES                                #
+#                              LES 3 SPECIALITES                                #
 #                                                                              #
-#  Les cles doivent rester : weaponsmith, armorer, alchemist, enchanter         #
+#  Les cles doivent rester : weaponsmith, armorer, alchemist                    #
 #                                                                              #
 #  Tout se fabrique a la Forge de Specialite (Structures/specialty-forge.yml),  #
 #  jamais a l'etabli. Les ingredients sont pris dans l'inventaire du joueur.    #
@@ -108,167 +108,199 @@ extraction:
 #                 compter combien d'exemplaires de chaque ingredient il faut.   #
 #    SHAPELESS  : 'ingredients' est une liste ; repeter une entree en demande   #
 #                 plusieurs.                                                    #
-#    ENCHANT    : applique un enchantement a l'objet tenu en main, au niveau    #
-#                 indique, meme au-dela de la limite vanilla. 'applies-to'      #
-#                 accepte ANY, un materiau exact, ou un motif avec * comme      #
-#                 '*_SWORD' / 'NETHERITE_*'.                                    #
+#    TRANSMUTE  : comme SHAPELESS, mais un ingredient supplementaire - la       #
+#                 'source' - est une potion dont l'effet est REPRIS par le      #
+#                 resultat. La duree et le niveau ne sont pas ecrits ici : ils  #
+#                 sont lus sur la fiole apportee par le joueur. C'est ce qui    #
+#                 permet a une potion de poison de devenir une potion de wither #
+#                 de la meme duree et du meme niveau, quelle que soit la fiole. #
 #                                                                              #
 #  '@resource' designe la ressource unique de la specialite.                    #
 #                                                                              #
 #  Un objet ('result' ou 'resource') se decrit ainsi :                          #
 #    material / amount / name / lore / custom-model-data / unbreakable /        #
-#    glow / enchants / stored-enchants / item-flags / potion / attributes       #
+#    glow / enchants / stored-enchants / item-flags / potion / attributes /     #
+#    consume-effects                                                            #
+#                                                                              #
+#  'glow' donne le reflet enchante sans enchantement quand le serveur le permet #
+#  (1.20.5+). Sur un serveur plus ancien, il retombe sur l'astuce habituelle -  #
+#  Solidite I masquee - qui, elle, change legerement l'objet.                   #
+#                                                                              #
+#  'consume-effects' donne des effets a un ALIMENT quand il est mange. Les      #
+#  effets d'une pomme d'or sont codes en dur dans le jeu et ne s'editent pas :  #
+#  ils sont donc appliques par l'extension au moment ou l'objet est consomme,   #
+#  juste avant ceux du jeu, qui ne peuvent alors plus les affaiblir.            #
 #                                                                              #
 #  'attributes' remplace les statistiques de base de l'objet : c'est ce qui     #
 #  permet de depasser reellement la netherite. Quand vous en definissez un sur  #
 #  une arme ou une armure, precisez TOUTES les statistiques voulues, car celles #
-#  d'origine ne s'appliquent plus.                                              #
-#  Reperes vanilla : epee netherite = 8 degats / -2.4 vitesse ;                 #
-#  plastron netherite = 8 armure / 3 resistance / 0.1 resistance au recul ;     #
-#  casque netherite = 3 armure / 3 resistance / 0.1 resistance au recul.        #
+#  d'origine ne s'appliquent plus - la portee d'une lance comprise.             #
+#  Reperes vanilla (valeur affichee dans l'infobulle entre parentheses) :       #
+#    epee netherite      = 7 (8) degats   / -2.4 (1.6) vitesse                  #
+#    hache netherite     = 9 (10) degats  / -3.0 (1.0) vitesse                  #
+#    lance netherite     = 4 (5) degats   / -3.13 (0.87) vitesse                #
+#    casque netherite    = 3 armure / 3 resistance / 0.1 resistance au recul    #
+#    plastron netherite  = 8 armure / 3 resistance / 0.1 resistance au recul    #
+#    jambieres netherite = 6 armure / 3 resistance / 0.1 resistance au recul    #
+#    bottes netherite    = 3 armure / 3 resistance / 0.1 resistance au recul    #
 # ============================================================================ #
 specialties:
 
   # ---------------------------------------------------------------- ARMES ----
+  #  Ressource : le Carbone. Il forge l'epee, la hache et la lance.
+  #  Les objets gardent le visuel et les caracteristiques de la netherite,
+  #  a une difference pres : +2 degats d'attaque.
   weaponsmith:
     display-name: '&c&lForgeron de Guerre'
     icon: NETHERITE_SWORD
     description:
       - '&7Vos forges ne battent que pour la guerre.'
-      - '&7Ressource unique&8: &cAcier Trempe'
-      - '&7Debloque&8: &fdes armes au-dela de la netherite'
+      - '&7Ressource unique&8: &8&lCarbone'
+      - '&7Debloque&8: &fles armes de carbone &8(&f+2 degats&8)'
 
     resource:
-      material: IRON_INGOT
-      name: '&c&lAcier Trempe'
+      material: COAL
+      name: '&8&lCarbone'
       glow: true
       lore:
         - '&8Ressource de specialite'
-        - '&7Extraite par les forgerons du royaume.'
+        - '&7Extrait par les forgerons du royaume.'
 
     recipes:
-      tempered-blade:
-        type: SHAPED
+      epee-de-carbone:
+        type: SHAPELESS
+        display-name: '&8&lEpee de Carbone'
         description:
-          - '&7Une epee qui surpasse la netherite&8:'
-          - '&f13 &7degats contre &f8&7.'
-        shape:
-          - 'RRR'
-          - 'RNR'
-          - ' S '
+          - '&7Une epee de netherite, &f+2 &7degats&8:'
+          - '&f10 &7degats contre &f8&7.'
         ingredients:
-          R: '@resource'
-          N: NETHERITE_SWORD
-          S: STICK
+          - NETHERITE_SWORD
+          - '@resource'
+          - '@resource'
+          - '@resource'
+          - '@resource'
         result:
           material: NETHERITE_SWORD
-          name: '&c&lLame Trempee'
+          name: '&8&lEpee de Carbone'
+          glow: true
           lore:
-            - '&7Forgee dans l acier du royaume.'
-          enchants:
-            SHARPNESS: 8
-            FIRE_ASPECT: 3
-            LOOTING: 4
-            UNBREAKING: 5
+            - '&7Trempee dans le carbone du royaume.'
           attributes:
             GENERIC_ATTACK_DAMAGE:
-              amount: 12
+              amount: 9
               operation: ADD_NUMBER
               slot: HAND
             GENERIC_ATTACK_SPEED:
-              amount: -2.2
+              amount: -2.4
               operation: ADD_NUMBER
               slot: HAND
 
-      siege-bow:
-        type: SHAPED
+      hache-de-carbone:
+        type: SHAPELESS
+        display-name: '&8&lHache de Carbone'
         description:
-          - '&7Puissance VIII, au-dela de la limite vanilla.'
-        shape:
-          - ' RS'
-          - 'R S'
-          - ' RS'
+          - '&7Une hache de netherite, &f+2 &7degats&8:'
+          - '&f12 &7degats contre &f10&7.'
         ingredients:
-          R: '@resource'
-          S: STRING
+          - NETHERITE_AXE
+          - '@resource'
+          - '@resource'
+          - '@resource'
+          - '@resource'
         result:
-          material: BOW
-          name: '&c&lArc de Siege'
-          enchants:
-            POWER: 8
-            FLAME: 1
-            PUNCH: 3
-            INFINITY: 1
-            UNBREAKING: 5
+          material: NETHERITE_AXE
+          name: '&8&lHache de Carbone'
+          glow: true
+          lore:
+            - '&7Trempee dans le carbone du royaume.'
+          attributes:
+            GENERIC_ATTACK_DAMAGE:
+              amount: 11
+              operation: ADD_NUMBER
+              slot: HAND
+            GENERIC_ATTACK_SPEED:
+              amount: -3.0
+              operation: ADD_NUMBER
+              slot: HAND
+
+      # La lance existe depuis la 1.21.11. Sur un serveur plus ancien, le
+      # materiau est inconnu : la recette est ignoree avec un avertissement
+      # dans la console, le reste de la specialite fonctionne normalement.
+      #
+      # ENTITY_INTERACTION_RANGE est la portee de la lance : elle vient d'un
+      # attribut, que definir 'attributes' remettrait a zero. Elle est donc
+      # redeclaree ici, comme les degats et la vitesse.
+      lance-de-carbone:
+        type: SHAPELESS
+        display-name: '&8&lLance de Carbone'
+        description:
+          - '&7Une lance de netherite, &f+2 &7degats&8:'
+          - '&f7 &7degats contre &f5&7.'
+        ingredients:
+          - NETHERITE_SPEAR
+          - '@resource'
+          - '@resource'
+          - '@resource'
+          - '@resource'
+        result:
+          material: NETHERITE_SPEAR
+          name: '&8&lLance de Carbone'
+          glow: true
+          lore:
+            - '&7Trempee dans le carbone du royaume.'
+          attributes:
+            GENERIC_ATTACK_DAMAGE:
+              amount: 6
+              operation: ADD_NUMBER
+              slot: HAND
+            GENERIC_ATTACK_SPEED:
+              amount: -3.13
+              operation: ADD_NUMBER
+              slot: HAND
+            ENTITY_INTERACTION_RANGE:
+              amount: 1.5
+              operation: ADD_NUMBER
+              slot: HAND
 
   # -------------------------------------------------------------- ARMURES ----
+  #  Ressource : le Mitril. Il forge les quatre pieces d'armure.
+  #  Les objets gardent le visuel et les caracteristiques de la netherite,
+  #  a deux differences pres : +2 d'armure et +1 de resistance.
   armorer:
     display-name: '&b&lArmurier Royal'
     icon: NETHERITE_CHESTPLATE
     description:
       - '&7Nul ne perce vos lignes.'
-      - '&7Ressource unique&8: &bPlaque de Mithril'
-      - '&7Debloque&8: &fdes armures au-dela de la netherite'
+      - '&7Ressource unique&8: &bMitril'
+      - '&7Debloque&8: &fles armures de mitril &8(&f+2 armure, +1 resistance&8)'
 
     resource:
-      material: NETHERITE_SCRAP
-      name: '&b&lPlaque de Mithril'
+      material: IRON_INGOT
+      name: '&b&lMitril'
       glow: true
       lore:
         - '&8Ressource de specialite'
-        - '&7Martelee par les armuriers du royaume.'
+        - '&7Martele par les armuriers du royaume.'
 
     recipes:
-      mithril-chestplate:
-        type: SHAPED
+      casque-de-mitril:
+        type: SHAPELESS
+        display-name: '&b&lCasque de Mitril'
         description:
-          - '&f11 &7armure contre &f8&7,'
-          - '&7et bien plus de resistance au recul.'
-        shape:
-          - 'R R'
-          - 'RNR'
-          - 'RRR'
+          - '&f5 &7armure contre &f3&7,'
+          - '&f4 &7de resistance contre &f3&7.'
         ingredients:
-          R: '@resource'
-          N: NETHERITE_CHESTPLATE
-        result:
-          material: NETHERITE_CHESTPLATE
-          name: '&b&lPlastron de Mithril'
-          enchants:
-            PROTECTION: 6
-            THORNS: 4
-            UNBREAKING: 5
-          attributes:
-            GENERIC_ARMOR:
-              amount: 11
-              operation: ADD_NUMBER
-              slot: CHEST
-            GENERIC_ARMOR_TOUGHNESS:
-              amount: 5
-              operation: ADD_NUMBER
-              slot: CHEST
-            GENERIC_KNOCKBACK_RESISTANCE:
-              amount: 0.4
-              operation: ADD_NUMBER
-              slot: CHEST
-
-      mithril-helmet:
-        type: SHAPED
-        description:
-          - '&f5 &7armure contre &f3&7.'
-        shape:
-          - 'RRR'
-          - 'RNR'
-        ingredients:
-          R: '@resource'
-          N: NETHERITE_HELMET
+          - NETHERITE_HELMET
+          - '@resource'
+          - '@resource'
+          - '@resource'
+          - '@resource'
         result:
           material: NETHERITE_HELMET
-          name: '&b&lHeaume de Mithril'
-          enchants:
-            PROTECTION: 6
-            RESPIRATION: 5
-            UNBREAKING: 5
+          name: '&b&lCasque de Mitril'
+          glow: true
+          lore:
+            - '&7Martele dans le mitril du royaume.'
           attributes:
             GENERIC_ARMOR:
               amount: 5
@@ -279,186 +311,206 @@ specialties:
               operation: ADD_NUMBER
               slot: HEAD
             GENERIC_KNOCKBACK_RESISTANCE:
-              amount: 0.3
+              amount: 0.1
               operation: ADD_NUMBER
               slot: HEAD
 
-  # -------------------------------------------------------------- POTIONS ----
+      plastron-de-mitril:
+        type: SHAPELESS
+        display-name: '&b&lPlastron de Mitril'
+        description:
+          - '&f10 &7armure contre &f8&7,'
+          - '&f4 &7de resistance contre &f3&7.'
+        ingredients:
+          - NETHERITE_CHESTPLATE
+          - '@resource'
+          - '@resource'
+          - '@resource'
+          - '@resource'
+        result:
+          material: NETHERITE_CHESTPLATE
+          name: '&b&lPlastron de Mitril'
+          glow: true
+          lore:
+            - '&7Martele dans le mitril du royaume.'
+          attributes:
+            GENERIC_ARMOR:
+              amount: 10
+              operation: ADD_NUMBER
+              slot: CHEST
+            GENERIC_ARMOR_TOUGHNESS:
+              amount: 4
+              operation: ADD_NUMBER
+              slot: CHEST
+            GENERIC_KNOCKBACK_RESISTANCE:
+              amount: 0.1
+              operation: ADD_NUMBER
+              slot: CHEST
+
+      pantalon-de-mitril:
+        type: SHAPELESS
+        display-name: '&b&lPantalon de Mitril'
+        description:
+          - '&f8 &7armure contre &f6&7,'
+          - '&f4 &7de resistance contre &f3&7.'
+        ingredients:
+          - NETHERITE_LEGGINGS
+          - '@resource'
+          - '@resource'
+          - '@resource'
+          - '@resource'
+        result:
+          material: NETHERITE_LEGGINGS
+          name: '&b&lPantalon de Mitril'
+          glow: true
+          lore:
+            - '&7Martele dans le mitril du royaume.'
+          attributes:
+            GENERIC_ARMOR:
+              amount: 8
+              operation: ADD_NUMBER
+              slot: LEGS
+            GENERIC_ARMOR_TOUGHNESS:
+              amount: 4
+              operation: ADD_NUMBER
+              slot: LEGS
+            GENERIC_KNOCKBACK_RESISTANCE:
+              amount: 0.1
+              operation: ADD_NUMBER
+              slot: LEGS
+
+      bottes-de-mitril:
+        type: SHAPELESS
+        display-name: '&b&lBottes de Mitril'
+        description:
+          - '&f5 &7armure contre &f3&7,'
+          - '&f4 &7de resistance contre &f3&7.'
+        ingredients:
+          - NETHERITE_BOOTS
+          - '@resource'
+          - '@resource'
+          - '@resource'
+          - '@resource'
+        result:
+          material: NETHERITE_BOOTS
+          name: '&b&lBottes de Mitril'
+          glow: true
+          lore:
+            - '&7Martelees dans le mitril du royaume.'
+          attributes:
+            GENERIC_ARMOR:
+              amount: 5
+              operation: ADD_NUMBER
+              slot: FEET
+            GENERIC_ARMOR_TOUGHNESS:
+              amount: 4
+              operation: ADD_NUMBER
+              slot: FEET
+            GENERIC_KNOCKBACK_RESISTANCE:
+              amount: 0.1
+              operation: ADD_NUMBER
+              slot: FEET
+
+  # ---------------------------------------------------- POTIONS ET NOURRITURE -
+  #  Ressource : le Goo. Il transforme un objet existant en sa version sublimee,
+  #  qui garde son visuel d'origine et gagne le reflet enchante.
   alchemist:
     display-name: '&d&lAlchimiste'
     icon: BREWING_STAND
     description:
       - '&7Vos fioles valent des armees.'
-      - '&7Ressource unique&8: &dEssence Arcanique'
-      - '&7Debloque&8: &fles elixirs de bataille'
+      - '&7Ressource unique&8: &aGoo'
+      - '&7Debloque&8: &fles potions et les vivres sublimes'
 
     resource:
-      material: GHAST_TEAR
-      name: '&d&lEssence Arcanique'
+      material: SLIME_BALL
+      name: '&a&lGoo'
       glow: true
       lore:
         - '&8Ressource de specialite'
-        - '&7Distillee par les alchimistes du royaume.'
+        - '&7Distille par les alchimistes du royaume.'
 
     recipes:
-      arcane-elixir:
-        type: SHAPELESS
+      # Potion de poison + Goo = potion de wither.
+      # La duree et le niveau sont repris de la fiole consommee : un poison
+      # allonge donne un wither allonge, un poison II donne un wither II.
+      potion-de-wither:
+        type: TRANSMUTE
+        display-name: '&8&lPotion de Wither'
+        icon: POTION
         description:
-          - '&7Force II et Resistance I, 5 minutes.'
+          - '&7Le poison vire au fletrissement.'
+          - '&8Meme duree et meme niveau que la fiole utilisee.'
+        source:
+          material: POTION
+          effect: POISON
+          name: '&2Potion de Poison'
         ingredients:
           - '@resource'
-          - GLASS_BOTTLE
-          - NETHER_WART
+        transmute:
+          effect: WITHER
+          amplifier-shift: 0
         result:
           material: POTION
-          name: '&d&lElixir Arcanique'
+          name: '&8&lPotion de Wither'
+          glow: true
+          lore:
+            - '&7Sublimee au goo du royaume.'
           potion:
-            color: '#c060ff'
-            effects:
-              INCREASE_DAMAGE:
-                duration: 5min
-                amplifier: 1
-              DAMAGE_RESISTANCE:
-                duration: 5min
-                amplifier: 0
+            color: '#3b3b3b'
 
-      restoration-draught:
-        type: SHAPELESS
+      # Potion de force II + Goo = potion de force III, meme duree.
+      # 'amplifier: 1' vise la force II exactement : sans cela, la force III
+      # produite ici pourrait a son tour etre transmutee en force IV.
+      potion-de-force-iii:
+        type: TRANSMUTE
+        display-name: '&4&lPotion de Force III'
+        icon: POTION
         description:
-          - '&7Regeneration II et Absorption II.'
+          - '&7Un cran au-dessus de la force II.'
+          - '&8Meme duree que la fiole utilisee.'
+        source:
+          material: POTION
+          effect: INCREASE_DAMAGE
+          amplifier: 1
+          name: '&4Potion de Force II'
         ingredients:
           - '@resource'
-          - '@resource'
-          - GLASS_BOTTLE
-          - GLOWSTONE_DUST
+        transmute:
+          effect: INCREASE_DAMAGE
+          amplifier-shift: 1
         result:
           material: POTION
-          amount: 2
-          name: '&d&lPhiltre de Restauration'
+          name: '&4&lPotion de Force III'
+          glow: true
+          lore:
+            - '&7Sublimee au goo du royaume.'
           potion:
-            color: '#ff6090'
-            effects:
-              REGENERATION:
-                duration: 45s
-                amplifier: 1
-              ABSORPTION:
-                duration: 2min
-                amplifier: 1
+            color: '#c02020'
 
-  # -------------------------------------------------------- ENCHANTEMENTS ----
-  #  Les enchantements sont appliques directement a l'objet tenu en main.
-  #  C'est necessaire : une enclume ramene toujours un livre au niveau maximum
-  #  vanilla, un livre Tranchant VIII y perdrait donc son interet.
-  enchanter:
-    display-name: '&5&lEnchanteur'
-    icon: ENCHANTING_TABLE
-    description:
-      - '&7Le savoir vaut mieux que l acier.'
-      - '&7Ressource unique&8: &5Rune Ancestrale'
-      - '&7Debloque&8: &fdes enchantements hors limites'
-
-    resource:
-      material: LAPIS_LAZULI
-      name: '&5&lRune Ancestrale'
-      glow: true
-      lore:
-        - '&8Ressource de specialite'
-        - '&7Gravee par les enchanteurs du royaume.'
-
-    recipes:
-      sharpness-viii:
-        type: ENCHANT
-        display-name: '&5Tranchant VIII'
+      # Pomme d'or + Goo = pomme d'or sublimee.
+      # Absorption II et Regeneration IV, contre I et II pour la pomme normale.
+      # Les effets d'un aliment ne s'editent pas : ils sont appliques par
+      # l'extension a la consommation, voir 'consume-effects' plus haut.
+      pomme-d-or-sublimee:
+        type: SHAPELESS
+        display-name: '&6&lPomme d Or Sublimee'
         description:
-          - '&7Trois niveaux au-dessus du maximum vanilla.'
-        enchantment: SHARPNESS
-        level: 8
-        applies-to: [ '*_SWORD', '*_AXE' ]
-        icon: DIAMOND_SWORD
+          - '&7Absorption &fII &7contre &fI&7,'
+          - '&7Regeneration &fIV &7contre &fII&7.'
         ingredients:
+          - GOLDEN_APPLE
           - '@resource'
-          - '@resource'
-          - '@resource'
-          - '@resource'
-          - '@resource'
-          - '@resource'
-          - DIAMOND
-
-      protection-vi:
-        type: ENCHANT
-        display-name: '&5Protection VI'
-        enchantment: PROTECTION
-        level: 6
-        applies-to: [ '*_HELMET', '*_CHESTPLATE', '*_LEGGINGS', '*_BOOTS' ]
-        icon: DIAMOND_CHESTPLATE
-        ingredients:
-          - '@resource'
-          - '@resource'
-          - '@resource'
-          - '@resource'
-          - '@resource'
-          - '@resource'
-          - '@resource'
-          - '@resource'
-
-      unbreaking-vi:
-        type: ENCHANT
-        display-name: '&5Solidite VI'
-        enchantment: UNBREAKING
-        level: 6
-        applies-to: [ ANY ]
-        icon: ANVIL
-        ingredients:
-          - '@resource'
-          - '@resource'
-          - '@resource'
-          - '@resource'
-          - '@resource'
-
-      efficiency-viii:
-        type: ENCHANT
-        display-name: '&5Efficacite VIII'
-        enchantment: EFFICIENCY
-        level: 8
-        applies-to: [ '*_PICKAXE', '*_AXE', '*_SHOVEL', '*_HOE' ]
-        icon: DIAMOND_PICKAXE
-        ingredients:
-          - '@resource'
-          - '@resource'
-          - '@resource'
-          - '@resource'
-          - '@resource'
-          - '@resource'
-
-      fortune-v:
-        type: ENCHANT
-        display-name: '&5Fortune V'
-        enchantment: FORTUNE
-        level: 5
-        applies-to: [ '*_PICKAXE', '*_SHOVEL', '*_AXE' ]
-        icon: EMERALD
-        ingredients:
-          - '@resource'
-          - '@resource'
-          - '@resource'
-          - '@resource'
-          - '@resource'
-          - '@resource'
-          - '@resource'
-          - '@resource'
-          - EMERALD
-
-      power-viii:
-        type: ENCHANT
-        display-name: '&5Puissance VIII'
-        enchantment: POWER
-        level: 8
-        applies-to: [ BOW ]
-        icon: BOW
-        ingredients:
-          - '@resource'
-          - '@resource'
-          - '@resource'
-          - '@resource'
-          - '@resource'
-          - '@resource'
+        result:
+          material: GOLDEN_APPLE
+          name: '&6&lPomme d Or Sublimee'
+          glow: true
+          lore:
+            - '&7Sublimee au goo du royaume.'
+          consume-effects:
+            ABSORPTION:
+              duration: 2min
+              amplifier: 1
+            REGENERATION:
+              duration: 5s
+              amplifier: 3
