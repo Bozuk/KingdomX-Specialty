@@ -2,18 +2,20 @@
 
 Extension (addon) pour [KingdomsX](https://github.com/CryptoMorin/KingdomsX).
 
-Chaque royaume choisit **une spécialité parmi quatre, au moment de sa création** : `/k create <nom>`
+Chaque royaume choisit **une spécialité parmi trois, au moment de sa création** : `/k create <nom>`
 ouvre le menu des spécialités et le royaume n'est fondé qu'une fois le choix fait. La spécialité
 donne accès à une **ressource unique**, produite par les **extracteurs de KingdomsX**, qui sert à
 fabriquer des objets exclusifs à la **Forge de Spécialité**, une structure de royaume ajoutée par
 l'extension. Le choix est **définitif** : seul un administrateur peut le modifier.
 
-| Spécialité                | Ressource unique     | Débloque |
-|---------------------------|----------------------|----------|
-| `weaponsmith` — Forgeron  | Acier Trempé         | des armes **au-dessus de la netherite** |
-| `armorer` — Armurier      | Plaque de Mithril    | des armures **au-dessus de la netherite** |
-| `alchemist` — Alchimiste  | Essence Arcanique    | des potions de bataille |
-| `enchanter` — Enchanteur  | Rune Ancestrale      | des enchantements **au-delà des limites vanilla** |
+| Spécialité                | Ressource unique | Débloque |
+|---------------------------|------------------|----------|
+| `weaponsmith` — Forgeron  | Carbone          | épée, hache et lance de netherite, **+2 dégâts** |
+| `armorer` — Armurier      | Mitril           | les 4 pièces d'armure netherite, **+2 armure et +1 résistance** |
+| `alchemist` — Alchimiste  | Goo              | potion de wither, potion de force III, pomme d'or sublimée |
+
+Les objets fabriqués gardent le **visuel et les caractéristiques de l'objet d'origine** — une épée
+de carbone reste une épée de netherite — avec en plus le reflet enchanté et le bonus ci-dessus.
 
 ---
 
@@ -29,6 +31,10 @@ l'extension. Le choix est **définitif** : seul un administrateur peut le modifi
 
 Prérequis : Minecraft **1.16+**, KingdomsX **1.17.18.1-BETA** ou plus récent. Folia est supporté.
 
+La **lance** (`NETHERITE_SPEAR`) n'existe que depuis la **1.21.11**. Sur un serveur plus ancien, sa
+recette est ignorée avec un avertissement dans la console ; les deux autres armes fonctionnent
+normalement.
+
 ## Commandes
 
 | Commande | Effet |
@@ -43,7 +49,7 @@ Alias : `/k specialite`, `/k spec`.
 
 ## Boucle de jeu
 
-1. **Fonder** — `/k create <nom>` ne crée rien tout de suite : le menu des quatre spécialités
+1. **Fonder** — `/k create <nom>` ne crée rien tout de suite : le menu des trois spécialités
    s'ouvre, une confirmation est demandée, et le royaume n'est fondé qu'ensuite. Fermer le menu
    sans choisir annule la création.
 2. **Produire** — la ressource sort des extracteurs KingdomsX (`/k structures`). En plus de ses
@@ -58,11 +64,26 @@ Alias : `/k specialite`, `/k spec`.
 La forge est le **seul** endroit où ces objets se fabriquent : il n'y a pas de recette d'établi.
 Un royaume sans la bonne spécialité ne voit tout simplement pas les recettes correspondantes.
 
-### L'enchanteur
+### Ce que fabrique chaque spécialité
 
-Les enchantements sont appliqués **directement à l'objet tenu en main**, pas via un livre. C'est
-volontaire : une enclume ramène toujours un enchantement à son niveau maximum vanilla, un livre
-Tranchant VIII n'aurait donc servi à rien.
+**Forgeron — Carbone.** Une arme de netherite + 4 carbone donne la même arme, reflet enchanté et
+2 dégâts de plus : épée 10 au lieu de 8, hache 12 au lieu de 10, lance 7 au lieu de 5. Vitesse
+d'attaque et portée inchangées.
+
+**Armurier — Mitril.** Une pièce d'armure netherite + 4 mitril donne la même pièce, reflet
+enchanté, +2 d'armure et +1 de résistance aux armures : casque 5/4, plastron 10/4, pantalon 8/4,
+bottes 5/4 (armure / résistance). Résistance au recul inchangée.
+
+**Alchimiste — Goo.** Trois transformations, toutes à un seul goo :
+
+| Ingrédient | Résultat |
+|---|---|
+| Potion de poison | Potion de wither, **même durée et même niveau** que la fiole utilisée |
+| Potion de force II | Potion de force III, **même durée** |
+| Pomme d'or | Pomme d'or sublimée : Absorption **II** et Régénération **IV**, contre I et II |
+
+Les potions de wither et de force III reprennent leurs valeurs de la fiole consommée, pas de la
+configuration : un poison allongé donne un wither allongé, un poison II donne un wither II.
 
 ## Langues
 
@@ -123,47 +144,70 @@ Le carburant, la cadence et le rendement des extracteurs se règlent côté King
 
 ### Ajouter une recette
 
-Sous `specialties.<spécialité>.recipes`. La forge n'a pas de grille de craft : une `shape` sert
-uniquement à compter les ingrédients.
+Sous `specialties.<spécialité>.recipes`. Trois types : `SHAPED`, `SHAPELESS` et `TRANSMUTE`.
+La forge n'a pas de grille de craft : une `shape` sert uniquement à compter les ingrédients.
 
 ```yaml
       ma-recette:
-        type: SHAPED              # SHAPED | SHAPELESS | ENCHANT
+        type: SHAPELESS           # SHAPED | SHAPELESS | TRANSMUTE
         display-name: '&cMa recette'
         description: [ '&7...' ]
-        shape: [ 'RRR', 'RNR', ' S ' ]
-        ingredients:              # une liste simple en SHAPELESS
-          R: '@resource'          # la ressource unique de la spécialité
-          N: NETHERITE_SWORD
-          S: STICK
+        ingredients:              # repeter une entree en demande plusieurs
+          - NETHERITE_SWORD
+          - '@resource'           # la ressource unique de la specialite
+          - '@resource'
         result:
           material: NETHERITE_SWORD
           name: '&cLame'
-          enchants: { SHARPNESS: 8 }        # au-delà du maximum vanilla
+          glow: true                         # le reflet enchante
           attributes:                        # ce qui dépasse vraiment la netherite
-            GENERIC_ATTACK_DAMAGE: { amount: 12, operation: ADD_NUMBER, slot: HAND }
-            GENERIC_ATTACK_SPEED:  { amount: -2.2, operation: ADD_NUMBER, slot: HAND }
+            GENERIC_ATTACK_DAMAGE: { amount: 9, operation: ADD_NUMBER, slot: HAND }
+            GENERIC_ATTACK_SPEED:  { amount: -2.4, operation: ADD_NUMBER, slot: HAND }
 ```
 
-Recette d'enchantement :
+Recette de transmutation — une potion `source` est consommée, et le résultat **reprend la durée et
+le niveau** de son effet :
 
 ```yaml
-      sharpness-viii:
-        type: ENCHANT
-        enchantment: SHARPNESS
-        level: 8
-        applies-to: [ '*_SWORD', '*_AXE' ]   # ANY, un matériau, ou un motif avec *
-        icon: DIAMOND_SWORD
-        ingredients: [ '@resource', '@resource', DIAMOND ]
+      potion-de-wither:
+        type: TRANSMUTE
+        icon: POTION
+        source:
+          material: POTION
+          effect: POISON          # la potion doit porter cet effet
+          amplifier: 1            # optionnel : ce niveau exactement
+          name: '&2Potion de Poison'
+        ingredients: [ '@resource' ]
+        transmute:
+          effect: WITHER          # l'effet du resultat
+          amplifier-shift: 0      # +1 pour monter d'un niveau
+        result:
+          material: POTION
+          name: '&8Potion de Wither'
+          glow: true
+          potion: { color: '#3b3b3b' }
 ```
 
 Un objet (`result` ou `resource`) accepte : `material`, `amount`, `name`, `lore`,
 `custom-model-data`, `unbreakable`, `glow`, `enchants`, `stored-enchants`, `item-flags`, `potion`,
-`attributes`.
+`attributes`, `consume-effects`.
 
 **Attention aux attributs** : les définir remplace les statistiques de base de l'objet. Sur une
-arme ou une armure, précisez donc toutes celles que vous voulez. Repères vanilla — épée netherite :
-8 dégâts / -2.4 vitesse ; plastron netherite : 8 armure / 3 résistance / 0.1 résistance au recul.
+arme ou une armure, précisez donc toutes celles que vous voulez — la portée d'une lance comprise.
+Repères vanilla (valeur affichée entre parenthèses) — épée netherite : 7 (8) dégâts / -2.4 (1.6)
+vitesse ; hache netherite : 9 (10) / -3.0 (1.0) ; lance netherite : 4 (5) / -3.13 (0.87) ;
+plastron netherite : 8 armure / 3 résistance / 0.1 résistance au recul ; casque et bottes : 3
+armure ; pantalon : 6 armure.
+
+**`consume-effects`** donne des effets à un **aliment** quand il est mangé. Les effets d'une pomme
+d'or sont codés en dur dans le jeu et ne s'éditent pas : l'extension les applique elle-même à la
+consommation, juste avant ceux du jeu, qui ne peuvent alors plus les affaiblir.
+
+```yaml
+          consume-effects:
+            ABSORPTION:   { duration: 2min, amplifier: 1 }
+            REGENERATION: { duration: 5s,   amplifier: 3 }
+```
 
 ## Notes techniques
 
@@ -190,8 +234,15 @@ arme ou une armure, précisez donc toutes celles que vous voulez. Repères vanil
   attributs (énumération, puis registre, préfixe `GENERIC_` abandonné) et la construction des
   modificateurs (`UUID + EquipmentSlot`, puis `NamespacedKey + EquipmentSlotGroup`). Les deux
   chemins sont tentés, et l'option est ignorée avec un avertissement si aucun ne convient.
-- **Ingrédients** — un ingrédient « matériau brut » ne consomme jamais une ressource de spécialité
-  du même matériau : la ressource est reconnue à son tag persistant.
+- **Reflet enchanté** — `glow` utilise le composant dédié quand le serveur l'a (1.20.5+), sinon
+  l'astuce habituelle d'une Solidité I masquée, qui elle change légèrement l'objet.
+- **Lecture des potions** — la `source` d'une transmutation est reconnue à l'effet qu'elle porte,
+  pas à son matériau : toutes les potions du jeu partagent `POTION`. La lecture passe par réflexion,
+  1.20.5 ayant remplacé `getBasePotionData()` — un type plus les drapeaux *extended* / *upgraded* —
+  par `getBasePotionType()`, où chaque variante connaît ses propres effets.
+- **Ingrédients** — un ingrédient « matériau brut » ne consomme jamais un objet de spécialité du
+  même matériau : la ressource et les objets sortis de la forge portent un tag persistant. Améliorer
+  une épée de carbone déjà améliorée est donc impossible, plutôt que coûteux.
 
 ## API
 
@@ -212,8 +263,8 @@ src/main/java/org/kingdoms/specialties/
 ├── config/                        config, langue, chemins de GUI
 ├── data/                          Specialty, recettes, métadonnées
 ├── gui/                           menu de sélection, menu de la forge
-├── items/                         parseur d'items, attributs, tag des ressources
-├── managers/                      extraction, forge, sélection
+├── items/                         parseur d'items, attributs, potions, tags
+├── managers/                      extraction, forge, sélection, consommation
 └── structure/                     type de structure et installation du fichier
 src/main/resources/
 ├── specialties.yml

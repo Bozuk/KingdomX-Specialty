@@ -41,7 +41,11 @@ public final class ItemParser {
         MODERN_EFFECT_NAMES.put("HARM", "INSTANT_DAMAGE");
         MODERN_EFFECT_NAMES.put("JUMP", "JUMP_BOOST");
         MODERN_EFFECT_NAMES.put("CONFUSION", "NAUSEA");
-        MODERN_EFFECT_NAMES.put("DAMAGE_RESISTANCE", "RESISTANCE");
+
+        // Both directions: an item stamped on a modern server may be read back on an older one.
+        for (Map.Entry<String, String> entry : new HashMap<>(MODERN_EFFECT_NAMES).entrySet()) {
+            MODERN_EFFECT_NAMES.put(entry.getValue(), entry.getKey());
+        }
     }
 
     private ItemParser() {}
@@ -108,7 +112,7 @@ public final class ItemParser {
                     warn(what + " uses an unknown enchantment: " + name);
                     continue;
                 }
-                // ignoreLevelRestriction: that's the whole point of the enchanter specialty.
+                // ignoreLevelRestriction: a specialty book is allowed past the vanilla cap.
                 book.addStoredEnchant(enchantment, Math.max(1, stored.getInt(name)), true);
             }
         }
@@ -125,9 +129,8 @@ public final class ItemParser {
             }
         }
 
-        if (section.isSet("glow") && section.getBoolean("glow") && meta.getEnchants().isEmpty()) {
-            meta.addEnchant(Enchantment.DURABILITY, 1, true);
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        if (section.isSet("glow") && section.getBoolean("glow")) {
+            applyGlow(meta);
         }
 
         if (section.isSet("item-flags")) {
@@ -144,6 +147,10 @@ public final class ItemParser {
             applyPotion((PotionMeta) meta, section.gotoSection("potion"), what);
         }
 
+        if (section.isSet("consume-effects")) {
+            SpecialtyItems.setConsumeEffects(meta, parseEffects(section.gotoSection("consume-effects"), what));
+        }
+
         item.setItemMeta(meta);
         return item;
     }
@@ -155,19 +162,49 @@ public final class ItemParser {
         }
 
         if (!section.isSet("effects")) return;
-        ConfigAccessor effects = section.gotoSection("effects");
-        for (String name : effects.getKeys()) {
+        for (PotionEffect effect : parseEffects(section.gotoSection("effects"), what)) {
+            meta.addCustomEffect(effect, true);
+        }
+    }
+
+    /** A section of {@code EFFECT: { duration, amplifier }} entries. */
+    public static List<PotionEffect> parseEffects(ConfigAccessor section, String what) {
+        List<PotionEffect> parsed = new ArrayList<>();
+
+        for (String name : section.getKeys()) {
             PotionEffectType type = matchPotionEffect(name);
             if (type == null) {
                 warn(what + " uses an unknown potion effect: " + name);
                 continue;
             }
 
-            ConfigAccessor effect = effects.gotoSection(name);
+            ConfigAccessor effect = section.gotoSection(name);
             Duration duration = effect.get("duration").getTime();
             int ticks = duration == null ? 600 : (int) (duration.toMillis() / 50L);
             int amplifier = effect.isSet("amplifier") ? effect.getInt("amplifier") : 0;
-            meta.addCustomEffect(new PotionEffect(type, Math.max(1, ticks), Math.max(0, amplifier)), true);
+            parsed.add(new PotionEffect(type, Math.max(1, ticks), Math.max(0, amplifier)));
+        }
+        return parsed;
+    }
+
+    /**
+     * The enchanted shimmer, without an enchantment when the server can do without one.
+     * <p>
+     * 1.20.5 added an override component for exactly this; before that the only way was a hidden
+     * enchantment, which does change how the item behaves - a specialty weapon would silently gain
+     * Unbreaking I. The override is therefore preferred, and the old trick is the fallback.
+     */
+    private static void applyGlow(ItemMeta meta) {
+        try {
+            ItemMeta.class.getMethod("setEnchantmentGlintOverride", Boolean.class).invoke(meta, Boolean.TRUE);
+            return;
+        } catch (ReflectiveOperationException | RuntimeException | LinkageError ignored) {
+            // Server older than 1.20.5.
+        }
+
+        if (meta.getEnchants().isEmpty()) {
+            meta.addEnchant(Enchantment.DURABILITY, 1, true);
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
     }
 
@@ -196,7 +233,7 @@ public final class ItemParser {
      * supports. Both spellings are therefore accepted.
      */
     @SuppressWarnings("deprecation")
-    private static PotionEffectType matchPotionEffect(String name) {
+    public static PotionEffectType matchPotionEffect(String name) {
         String normalized = name.trim().toUpperCase(Locale.ENGLISH);
 
         PotionEffectType byName = PotionEffectType.getByName(normalized);

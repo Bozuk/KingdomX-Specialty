@@ -15,20 +15,18 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * The four specialties a kingdom can pick from. A kingdom owns exactly one of them, forever.
+ * The three specialties a kingdom can pick from. A kingdom owns exactly one of them, forever.
  * <p>
  * The enum constants are fixed, but everything they expose (name, icon, unique resource and the
  * recipes they unlock) comes from {@code specialties.yml} and is refreshed on every reload.
  */
 public enum Specialty {
-    /** Weapons. */
+    /** Weapons: sword, axe and spear, a notch above netherite. */
     WEAPONSMITH("weaponsmith", Material.IRON_SWORD),
-    /** Armors. */
+    /** Armors: the four pieces, a notch above netherite. */
     ARMORER("armorer", Material.IRON_CHESTPLATE),
-    /** Potions. */
+    /** Potions and food. */
     ALCHEMIST("alchemist", Material.BREWING_STAND),
-    /** Enchantments beyond the vanilla caps. */
-    ENCHANTER("enchanter", Material.ENCHANTING_TABLE),
     ;
 
     private static final Specialty[] VALUES = values();

@@ -40,9 +40,9 @@ item:
       {$s}Le seul endroit ou fabriquer les
       {$s}objets de la specialite du royaume.
 
-      {$dot} {$p}Armes et armures {$sep}au-dela de la netherite
-      {$dot} {$p}Potions {$sep}de bataille
-      {$dot} {$p}Enchantements {$sep}au-dela des limites vanilla
+      {$dot} {$p}Armes {$sep}de carbone, au-dela de la netherite
+      {$dot} {$p}Armures {$sep}de mitril, au-dela de la netherite
+      {$dot} {$p}Potions et vivres {$sep}sublimes au goo
 
       {$sep}Le contenu du menu depend de la
       {$sep}specialite choisie par le royaume.

@@ -75,20 +75,11 @@ specialties:
   forge:
     missing-ingredients: '{$e}Il vous manque des ingredients pour cette recette.'
     crafted: '{$p}Forge{$colon} {$s}%recipe%'
-    enchanted: '{$p}Enchantement applique{$colon} {$s}%recipe% {$sep}(niveau {$s}%level%{$sep})'
-
-    enchant:
-      no-item: "{$e}Tenez en main l'objet a enchanter, puis cliquez."
-      wrong-item: "{$e}Cet enchantement ne s'applique pas a l'objet que vous tenez."
-      already: '{$e}Cet objet possede deja cet enchantement au niveau {$es}%level%{$e} ou plus.'
 
     # Lignes construites par le menu de la forge pour chaque recette.
     entry:
-      enchantment: '&7Enchantement &f%enchantment% &7niveau &e%level%'
-      beyond-vanilla: '&8Au-dela de la limite vanilla'
       ingredients: '&7Ingredients requis&8:'
       ingredient-ok: '&a %owned%/%required% &7%ingredient%'
       ingredient-missing: '&c %owned%/%required% &7%ingredient%'
-      hold-item: "&7Tenez l'objet en main, puis cliquez."
       click-to-forge: '&aCliquez pour forger.'
       missing: '&cIngredients manquants.'

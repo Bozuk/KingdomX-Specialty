@@ -17,6 +17,7 @@ import org.kingdoms.specialties.config.SpecialtiesLang;
 import org.kingdoms.specialties.data.ProductionRemainderMetaHandler;
 import org.kingdoms.specialties.data.Specialty;
 import org.kingdoms.specialties.data.SpecialtyMetaHandler;
+import org.kingdoms.specialties.managers.ConsumeListener;
 import org.kingdoms.specialties.managers.ExtractionListener;
 import org.kingdoms.specialties.locale.SpecialtiesLanguages;
 import org.kingdoms.specialties.managers.KingdomCreationListener;
@@ -29,7 +30,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * KingdomsX addon: every kingdom commits to one of four specialties, which unlocks a unique
+ * KingdomsX addon: every kingdom commits to one of three specialties, which unlocks a unique
  * resource - produced by the kingdom's extractors - and a set of exclusive crafting recipes.
  */
 public final class SpecialtiesAddon extends JavaPlugin implements Addon {
@@ -83,6 +84,7 @@ public final class SpecialtiesAddon extends JavaPlugin implements Addon {
 
         Bukkit.getPluginManager().registerEvents(new ExtractionListener(), this);
         Bukkit.getPluginManager().registerEvents(new KingdomCreationListener(), this);
+        Bukkit.getPluginManager().registerEvents(new ConsumeListener(), this);
 
         new CommandSpecialty();
         new CommandAdminSpecialty(CommandAdmin.getInstance());

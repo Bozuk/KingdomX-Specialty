@@ -4,9 +4,11 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 import org.kingdoms.specialties.config.SpecialtiesLang;
 import org.kingdoms.specialties.data.Specialty;
 import org.kingdoms.specialties.data.SpecialtyRecipe;
+import org.kingdoms.specialties.items.PotionSupport;
 import org.kingdoms.specialties.items.SpecialtyItems;
 
 import java.util.Map;
@@ -44,14 +46,36 @@ public final class ForgeService {
         return total;
     }
 
+    /** @return the first matching item of the inventory, or {@code null}. */
+    private static ItemStack find(Player player, SpecialtyRecipe.Ingredient ingredient) {
+        Inventory inventory = player.getInventory();
+
+        for (int slot = 0; slot < inventory.getSize(); slot++) {
+            ItemStack item = inventory.getItem(slot);
+            if (matches(item, ingredient)) return item;
+        }
+        return null;
+    }
+
     private static boolean matches(ItemStack item, SpecialtyRecipe.Ingredient ingredient) {
         if (item == null || item.getType() == Material.AIR) return false;
 
         Specialty tagged = SpecialtyItems.getResourceSpecialty(item);
         if (ingredient.isSpecialtyResource()) return tagged == ingredient.getResourceOf();
 
-        // A plain material ingredient must never eat a specialty resource of the same material.
-        return tagged == null && item.getType() == ingredient.getMaterial();
+        // A plain material ingredient must never eat a specialty item of the same material: neither
+        // a resource, nor something the forge produced itself.
+        if (tagged != null || SpecialtyItems.isForged(item)) return false;
+        if (item.getType() != ingredient.getMaterial()) return false;
+
+        if (ingredient.getEffectType() == null) return true;
+
+        // A potion ingredient is picked by what it does, not by its material: every potion of the
+        // game shares POTION. An amplifier, when set, has to match exactly.
+        PotionEffect effect = PotionSupport.findEffect(item, ingredient.getEffectType());
+        if (effect == null) return false;
+        return ingredient.getEffectAmplifier() == null
+                || effect.getAmplifier() == ingredient.getEffectAmplifier();
     }
 
     private static void consume(Player player, SpecialtyRecipe recipe) {
@@ -73,7 +97,7 @@ public final class ForgeService {
     }
 
     /**
-     * Runs a crafting recipe.
+     * Runs a recipe.
      *
      * @return {@code true} if the item was produced. Errors are reported to the player.
      */
@@ -83,59 +107,28 @@ public final class ForgeService {
             return false;
         }
 
-        ItemStack result = recipe.getResult();
-        if (result == null) return false;
-
-        consume(player, recipe);
-        give(player, result);
-
-        SpecialtiesLang.FORGE_CRAFTED.sendMessage(player, "recipe", displayNameOf(recipe));
-        return true;
-    }
-
-    /**
-     * Applies an enchanting recipe to the item in the player's main hand.
-     *
-     * @return {@code true} if the enchantment was applied.
-     */
-    public static boolean enchant(Player player, SpecialtyRecipe recipe) {
-        ItemStack held = player.getInventory().getItemInMainHand();
-        if (held == null || held.getType() == Material.AIR) {
-            SpecialtiesLang.FORGE_ENCHANT_NO_ITEM.sendError(player);
-            return false;
+        // A transmutation copies the duration and the level of the potion it consumes, so the
+        // bottle has to be read before the inventory is emptied of it.
+        ItemStack source = null;
+        if (recipe.getType() == SpecialtyRecipe.Type.TRANSMUTE) {
+            ItemStack found = find(player, recipe.getSource());
+            if (found == null) {
+                SpecialtiesLang.FORGE_MISSING_INGREDIENTS.sendError(player);
+                return false;
+            }
+            source = found.clone();
         }
 
-        if (!recipe.accepts(held)) {
-            SpecialtiesLang.FORGE_ENCHANT_WRONG_ITEM.sendError(player);
-            return false;
-        }
-
-        int current = held.getEnchantmentLevel(recipe.getEnchantment());
-        if (current >= recipe.getLevel()) {
-            SpecialtiesLang.FORGE_ENCHANT_ALREADY.sendError(player, "level", current);
-            return false;
-        }
-
-        if (!hasIngredients(player, recipe)) {
+        ItemStack result = recipe.buildResult(source);
+        if (result == null) {
             SpecialtiesLang.FORGE_MISSING_INGREDIENTS.sendError(player);
             return false;
         }
 
         consume(player, recipe);
+        give(player, result);
 
-        // The held stack may have been consumed as an ingredient, so re-read it.
-        held = player.getInventory().getItemInMainHand();
-        if (held == null || held.getType() == Material.AIR || !recipe.accepts(held)) {
-            SpecialtiesLang.FORGE_ENCHANT_NO_ITEM.sendError(player);
-            return false;
-        }
-
-        // Unsafe on purpose: going past the vanilla cap is the point of the enchanter.
-        held.addUnsafeEnchantment(recipe.getEnchantment(), recipe.getLevel());
-
-        SpecialtiesLang.FORGE_ENCHANTED.sendMessage(player,
-                "recipe", displayNameOf(recipe),
-                "level", recipe.getLevel());
+        SpecialtiesLang.FORGE_CRAFTED.sendMessage(player, "recipe", displayNameOf(recipe));
         return true;
     }
 
