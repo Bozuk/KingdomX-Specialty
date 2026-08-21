@@ -27,7 +27,9 @@ de carbone reste une épée de netherite — avec en plus le reflet enchanté et
    - `plugins/Kingdoms/specialties.yml` — la configuration ;
    - `plugins/Kingdoms/specialties/languages/<code>.yml` — un fichier de messages par langue ;
    - `plugins/Kingdoms/Structures/specialty-forge.yml` — la structure ;
-   - les menus dans les dossiers GUI de KingdomsX.
+   - les menus dans les dossiers GUI de KingdomsX ;
+   - une entrée `specialty-forge` dans `guis/<langue>/structures/nexus/structures.yml`, le menu
+     d'achat des structures — sans elle la forge n'y apparaît pas (voir les notes techniques).
 
 Prérequis : Minecraft **1.16+**, KingdomsX **1.17.18.1-BETA** ou plus récent. Folia est supporté.
 
@@ -227,6 +229,13 @@ consommation, juste avant ceux du jeu, qui ne peuvent alors plus les affaiblir.
 - **Structure** — un `StructureType` enregistré dans le registre de KingdomsX. Le fichier
   `Structures/specialty-forge.yml` n'est écrit qu'après l'extraction des structures par défaut :
   créer ce dossier trop tôt empêcherait KingdomsX d'y déposer les siennes sur un serveur neuf.
+- **Menu d'achat** — enregistrer la structure ne suffit pas à la rendre achetable. KingdomsX
+  parcourt les structures du registre et, pour chacune, cherche une option **du même nom** dans
+  `guis/<langue>/structures/nexus/structures.yml` ; une structure sans entrée y est ignorée sans le
+  moindre message en console. L'extension ajoute donc la sienne au démarrage, une seule fois, dans
+  le menu de chaque langue installée, puis n'y retouche jamais : l'entrée devient une ligne de
+  configuration du serveur comme une autre, libre d'être déplacée, restylée ou supprimée. Le slot
+  est choisi parmi ceux que le menu n'utilise pas encore.
 - **Langues** — l'extension enregistre elle-même ses messages compilés pour chaque langue
   installée, en lisant son propre dossier. Les entrées manquantes retombent sur l'anglais du code,
   donc aucun message ne peut rester non résolu, même avec un fichier vide ou incomplet.

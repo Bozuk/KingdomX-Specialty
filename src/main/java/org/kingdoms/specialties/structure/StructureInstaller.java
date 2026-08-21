@@ -43,10 +43,15 @@ public final class StructureInstaller {
         StructureRegistry.get().init();
     }
 
+    /** Where the structure file is expected to live. */
+    public static Path targetPath() {
+        return StructureRegistry.STRUCTURES_PATH.resolve(SpecialtyForgeStructureType.NAME + ".yml");
+    }
+
     private static boolean install() {
         if (installed) return true;
 
-        Path target = StructureRegistry.STRUCTURES_PATH.resolve(SpecialtyForgeStructureType.NAME + ".yml");
+        Path target = targetPath();
         if (Files.exists(target)) {
             installed = true;
             return true;
