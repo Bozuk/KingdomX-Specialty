@@ -1,30 +1,30 @@
 # ============================================================================ #
-#  Entree ajoutee au menu d'achat des structures (nexus > Structures) par       #
-#  l'extension Specialties.                                                     #
+#  Entry added to the structure shop (nexus > Structures) by the Specialties    #
+#  addon.                                                                       #
 #                                                                              #
-#  KingdomsX ne construit pas ce menu tout seul : il parcourt les structures    #
-#  enregistrees et, pour chacune, cherche une option DU MEME NOM dans le        #
-#  fichier du menu. Une structure sans entree ici est simplement ignoree, sans  #
-#  aucun message. C'est pourquoi l'extension ajoute la sienne au demarrage.     #
+#  KingdomsX does not build that menu on its own: it walks the registered       #
+#  structures and, for each of them, looks for an option OF THE SAME NAME in    #
+#  the menu file. A structure with no entry here is skipped, without a single   #
+#  message. Hence the addon adding its own on startup.                          #
 #                                                                              #
-#  Une fois ecrite, cette entree vous appartient : deplacez-la, renommez-la ou  #
-#  changez son icone comme n'importe quelle autre. L'extension ne la reecrit    #
-#  jamais. La supprimer retire la forge du menu d'achat.                        #
+#  Once written, this entry is yours: move it, rename it or restyle it like any #
+#  other. The addon never writes over it. Deleting it takes the forge out of    #
+#  the shop.                                                                    #
 # ============================================================================ #
 specialty-forge:
-  name: "{$p}Forge de Specialite"
+  name: "{$p}Specialty Forge"
   material: SMITHING_TABLE
   sound: BLOCK_ANVIL_USE
   lore: |
-    {$s}Le seul endroit ou fabriquer les
-    {$s}objets de la specialite du royaume.
+    {$s}The only place the items of the
+    {$s}kingdom's specialty can be made.
 
-    {$dot} {$p}Armes {$sep}de carbone, au-dela de la netherite
-    {$dot} {$p}Armures {$sep}de mitril, au-dela de la netherite
-    {$dot} {$p}Potions et vivres {$sep}sublimes au goo
+    {$dot} {$p}Carbon weapons {$sep}beyond netherite
+    {$dot} {$p}Mithril armor {$sep}beyond netherite
+    {$dot} {$p}Potions and provisions {$sep}sublimated with goo
 
-    {$sep}Le contenu du menu depend de la
-    {$sep}specialite choisie par le royaume.
+    {$sep}What the menu holds depends on the
+    {$sep}specialty the kingdom picked.
 
-    {$p}Cout{$colon} {$s}%fancy@cost%
+    {$p}Cost{$colon} {$s}%fancy@cost%
   slot: %slot%

@@ -1,4 +1,4 @@
-title: "{$sep}-=[ {$p}Forge de Specialite {$sep}]=-"
+title: "{$sep}-=[ {$p}Specialty Forge {$sep}]=-"
 rows: 6
 sound: BLOCK_ANVIL_USE
 
@@ -11,39 +11,39 @@ options:
   info:
     slot: 4
     material: PAPER
-    name: '{$p}Specialite{$colon} {$s}%specialty%'
+    name: '{$p}Specialty{$colon} {$s}%specialty%'
     lore: |
-      {$p}Ressource{$colon} {$s}%specialty_resource%
-      {$p}Recettes{$colon} {$s}%recipes%
+      {$p}Resource{$colon} {$s}%specialty_resource%
+      {$p}Recipes{$colon} {$s}%recipes%
 
-      {$sep}Les ingredients sont pris
-      {$sep}dans votre inventaire.
+      {$sep}Ingredients are taken from
+      {$sep}your own inventory.
 
-  # Une entree par recette de la specialite. Le nom, l'icone et la description
-  # sont remplaces a l'ouverture par le contenu de specialties.yml.
+  # One entry per recipe of the specialty. The name, the icon and the
+  # description are replaced on opening by what specialties.yml holds.
   recipes:
     slots: [ 10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43 ]
     material: PAPER
-    name: '{$p}Recette'
+    name: '{$p}Recipe'
 
   upgrade:
     slot: 48
     upgrade:
       condition: level < max_level
-      name: "{$sp}Ameliorer{$colon} {$s}%roman@level% {$sep}> {$s}%roman@next_level%"
+      name: "{$sp}Upgrade{$colon} {$s}%roman@level% {$sep}> {$s}%roman@next_level%"
       material: NETHER_STAR
       lore:
-        - "{$dot} {$p}Cout{$colon} {$s}%upgrade_cost%"
+        - "{$dot} {$p}Cost{$colon} {$s}%upgrade_cost%"
     maxxed:
-      name: "{$sp}Niveau{$colon} {$s}%roman@level%"
+      name: "{$sp}Level{$colon} {$s}%roman@level%"
       material: NETHER_STAR
       lore:
-        - "{$sep}Niveau maximum atteint."
+        - "{$sep}Maximum level reached."
 
   break:
     slot: 50
-    name: "&4Demolir"
+    name: "&4Demolish"
     material: REDSTONE_BLOCK
     sound: ENTITY_ITEM_BREAK
     lore:
-      - "{$s}Detruit la structure."
+      - "{$s}Destroys the structure."

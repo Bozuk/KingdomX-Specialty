@@ -7,8 +7,17 @@
 #                                                                              #
 #  NOTE IMPORTANTE : KingdomsX ne propose pas de locale francaise (les langues  #
 #  disponibles sont en, de, es, it, pt, pl, ru, cs, hu, tr, uk, vi, zh). Ce     #
-#  fichier n'est donc jamais charge automatiquement. Sur un serveur francais,   #
-#  qui tourne en anglais, copiez son contenu dans en.yml du meme dossier.       #
+#  fichier n'est donc jamais charge automatiquement : un serveur francais       #
+#  tourne en anglais. Pour lui donner ces messages, pointez la langue EN vers   #
+#  ce fichier dans specialties.yml :                                            #
+#                                                                              #
+#      messages:                                                                #
+#        language-files:                                                        #
+#          EN: fr                                                               #
+#                                                                              #
+#  Le reste du texte visible en jeu - noms des specialites, des objets et des   #
+#  recettes, titres des menus - est en anglais par defaut et n'est pas gere     #
+#  par langue : il se traduit dans specialties.yml et les fichiers de menu.     #
 # ============================================================================ #
 
 command:
