@@ -4,10 +4,10 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.kingdoms.config.accessor.ConfigAccessor;
 import org.kingdoms.specialties.SpecialtiesAddon;
+import org.kingdoms.locale.messenger.StaticMessenger;
 import org.kingdoms.specialties.config.SpecialtiesConfig;
-import org.kingdoms.specialties.items.ItemParser;
+import org.kingdoms.specialties.items.ItemFactory;
 import org.kingdoms.specialties.items.SpecialtyItems;
-import org.kingdoms.specialties.items.TextUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -130,26 +130,33 @@ public enum Specialty {
                         "specialties.yml is missing the '" + specialty.configKey + "' specialty.");
                 continue;
             }
-            specialty.load(specialties.gotoSection(specialty.configKey));
+            try {
+                specialty.load(specialties.gotoSection(specialty.configKey));
+            } catch (RuntimeException ex) {
+                SpecialtiesAddon.get().getLogger().severe(
+                        "Failed to load the '" + specialty.configKey + "' specialty: " + ex);
+            }
         }
     }
 
     private void load(ConfigAccessor section) {
         this.displayName = section.isSet("display-name")
-                ? TextUtil.colorize(section.getString("display-name"))
+                ? new StaticMessenger(section.getString("display-name")).parse()
                 : configKey;
 
-        Material parsedIcon = section.isSet("icon") ? ItemParser.matchMaterial(section.getString("icon")) : null;
+        Material parsedIcon = section.isSet("icon") ? ItemFactory.material(section.getString("icon")) : null;
         this.icon = parsedIcon == null ? fallbackIcon : parsedIcon;
 
         List<String> lines = new ArrayList<>();
         if (section.isSet("description")) {
-            for (String line : section.getStringList("description")) lines.add(TextUtil.colorize(line));
+            for (String line : section.getStringList("description")) {
+                lines.add(new StaticMessenger(line).parse());
+            }
         }
         this.description = Collections.unmodifiableList(lines);
 
         if (section.isSet("resource")) {
-            ItemStack parsed = ItemParser.parse(section.gotoSection("resource"), "The resource of " + configKey);
+            ItemStack parsed = ItemFactory.parse(section.gotoSection("resource"), "The resource of " + configKey);
             if (parsed != null) {
                 parsed.setAmount(1);
                 this.resource = SpecialtyItems.tagResource(parsed, this);

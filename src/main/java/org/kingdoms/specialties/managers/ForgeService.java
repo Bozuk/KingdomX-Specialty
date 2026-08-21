@@ -5,13 +5,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import org.kingdoms.libs.xseries.XItemStack;
 import org.kingdoms.specialties.config.SpecialtiesLang;
 import org.kingdoms.specialties.data.Specialty;
 import org.kingdoms.specialties.data.SpecialtyRecipe;
 import org.kingdoms.specialties.items.PotionSupport;
 import org.kingdoms.specialties.items.SpecialtyItems;
-
-import java.util.Map;
 
 /**
  * The crafting logic behind the specialty forge: what a player can make, what it costs them, and
@@ -134,10 +133,7 @@ public final class ForgeService {
 
     /** Adds the item to the inventory, dropping whatever doesn't fit at the player's feet. */
     public static void give(Player player, ItemStack item) {
-        Map<Integer, ItemStack> rejected = player.getInventory().addItem(item);
-        for (ItemStack left : rejected.values()) {
-            player.getWorld().dropItemNaturally(player.getLocation(), left);
-        }
+        XItemStack.giveOrDrop(player, item);
     }
 
     public static String displayNameOf(SpecialtyRecipe recipe) {

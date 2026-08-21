@@ -5,12 +5,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+import org.kingdoms.libs.xseries.XPotion;
 import org.kingdoms.specialties.SpecialtiesAddon;
 import org.kingdoms.specialties.data.Specialty;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,12 +22,13 @@ import java.util.List;
  *   <li>{@code forged_by} - the recipe an item came out of. A plain material ingredient refuses
  *       these, so upgrading an already upgraded netherite sword is not a way to waste a stack of
  *       the kingdom's resource;</li>
- *   <li>{@code consume_effects} - the effects a food item hands out when eaten. Food effects are
- *       hardcoded in the game, so a golden apple cannot be made stronger through its meta: the
- *       effects are read back from here when the item is consumed.</li>
+ *   <li>{@code consume_effects} - the effects a food item hands out when eaten, in the XSeries
+ *       {@code EFFECT, ticks, amplifier} form, one per line.</li>
  * </ul>
  */
 public final class SpecialtyItems {
+    private static final String EFFECT_SEPARATOR = "\n";
+
     private static NamespacedKey resourceKey;
     private static NamespacedKey forgedKey;
     private static NamespacedKey consumeEffectsKey;
@@ -54,86 +54,59 @@ public final class SpecialtyItems {
 
     /** Stamps the specialty this resource belongs to onto the item. */
     public static ItemStack tagResource(ItemStack item, Specialty specialty) {
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) return item;
-        meta.getPersistentDataContainer().set(resourceKey(), PersistentDataType.STRING, specialty.name());
-        item.setItemMeta(meta);
-        return item;
+        return tag(item, resourceKey(), specialty.name());
     }
 
     /** @return the specialty this item is the resource of, or {@code null}. */
     public static Specialty getResourceSpecialty(ItemStack item) {
-        if (item == null || !item.hasItemMeta()) return null;
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) return null;
-
-        PersistentDataContainer container = meta.getPersistentDataContainer();
-        String raw = container.get(resourceKey(), PersistentDataType.STRING);
-        return raw == null ? null : Specialty.fromString(raw);
+        return Specialty.fromString(read(item, resourceKey()));
     }
 
     /** Stamps the recipe an item came out of, so the forge never eats its own output. */
     public static ItemStack tagForged(ItemStack item, String recipeId) {
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) return item;
-        meta.getPersistentDataContainer().set(forgedKey(), PersistentDataType.STRING, recipeId);
-        item.setItemMeta(meta);
-        return item;
+        return tag(item, forgedKey(), recipeId);
     }
 
     /** @return whether this item was forged at a specialty forge. */
     public static boolean isForged(ItemStack item) {
-        if (item == null || !item.hasItemMeta()) return false;
-        ItemMeta meta = item.getItemMeta();
-        return meta != null && meta.getPersistentDataContainer().has(forgedKey(), PersistentDataType.STRING);
+        return read(item, forgedKey()) != null;
     }
 
     // ----------------------------------------------------------- consume effects
 
-    /** Stores the effects as {@code key:ticks:amplifier}, separated by semicolons. */
-    public static void setConsumeEffects(ItemMeta meta, List<PotionEffect> effects) {
-        if (effects.isEmpty()) return;
-
-        StringBuilder encoded = new StringBuilder();
-        for (PotionEffect effect : effects) {
-            if (encoded.length() != 0) encoded.append(';');
-            encoded.append(nameOf(effect.getType()))
-                    .append(':').append(effect.getDuration())
-                    .append(':').append(effect.getAmplifier());
-        }
-        meta.getPersistentDataContainer().set(consumeEffectsKey(), PersistentDataType.STRING, encoded.toString());
+    public static ItemStack tagConsumeEffects(ItemStack item, List<String> effects) {
+        return tag(item, consumeEffectsKey(), String.join(EFFECT_SEPARATOR, effects));
     }
 
-    /** @return the effects this item hands out when eaten or drunk. Never {@code null}. */
-    public static List<PotionEffect> getConsumeEffects(ItemStack item) {
-        if (item == null || !item.hasItemMeta()) return Collections.emptyList();
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) return Collections.emptyList();
-
-        String encoded = meta.getPersistentDataContainer().get(consumeEffectsKey(), PersistentDataType.STRING);
+    /**
+     * @return the effects this item hands out when eaten. Parsing on the way out rather than on the
+     *         way in means an item keeps working across an XSeries update that widens the syntax.
+     */
+    public static List<XPotion.Effect> getConsumeEffects(ItemStack item) {
+        String encoded = read(item, consumeEffectsKey());
         if (encoded == null || encoded.isEmpty()) return Collections.emptyList();
 
-        List<PotionEffect> effects = new ArrayList<>(2);
-        for (String entry : encoded.split(";")) {
-            String[] parts = entry.split(":");
-            if (parts.length != 3) continue;
-
-            PotionEffectType type = ItemParser.matchPotionEffect(parts[0]);
-            if (type == null) continue;
-
-            try {
-                effects.add(new PotionEffect(type,
-                        Math.max(1, Integer.parseInt(parts[1])),
-                        Math.max(0, Integer.parseInt(parts[2]))));
-            } catch (NumberFormatException ignored) {
-                // A hand-edited item, skipped rather than crashing the meal.
-            }
-        }
-        return effects;
+        return XPotion.parseEffects(Arrays.asList(encoded.split(EFFECT_SEPARATOR)));
     }
 
-    /** Whatever name this server knows the effect by, see {@link PotionSupport#keyOf}. */
-    private static String nameOf(PotionEffectType type) {
-        return PotionSupport.keyOf(type);
+    // ------------------------------------------------------------------ plumbing
+
+    private static ItemStack tag(ItemStack item, NamespacedKey key, String value) {
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return item;
+
+        meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, value);
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    private static String read(ItemStack item, NamespacedKey key) {
+        if (item == null || !item.hasItemMeta()) return null;
+
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return null;
+
+        PersistentDataContainer container = meta.getPersistentDataContainer();
+        return container.get(key, PersistentDataType.STRING);
     }
 }

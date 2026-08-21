@@ -172,10 +172,13 @@ La forge n'a pas de grille de craft : une `shape` sert uniquement à compter les
         result:
           material: NETHERITE_SWORD
           name: '&cLame'
-          glow: true                         # le reflet enchante
+          glint: true                        # le reflet enchante
           attributes:                        # ce qui dépasse vraiment la netherite
-            GENERIC_ATTACK_DAMAGE: { amount: 9, operation: ADD_NUMBER, slot: HAND }
-            GENERIC_ATTACK_SPEED:  { amount: -2.4, operation: ADD_NUMBER, slot: HAND }
+            ATTACK_DAMAGE:
+              name: specialties:ma-recette-attack-damage
+              amount: 9
+              operation: ADD_NUMBER
+              slot: HAND
 ```
 
 Recette de transmutation — une potion `source` est consommée, et le résultat **reprend la durée et
@@ -197,29 +200,41 @@ le niveau** de son effet :
         result:
           material: POTION
           name: '&8Potion de Wither'
-          glow: true
-          potion: { color: '#3b3b3b' }
+          glint: true
+          color: '#3b3b3b'
 ```
 
-Un objet (`result` ou `resource`) accepte : `material`, `amount`, `name`, `lore`,
-`custom-model-data`, `unbreakable`, `glow`, `enchants`, `stored-enchants`, `item-flags`, `potion`,
-`attributes`, `consume-effects`.
+Un objet (`result` ou `resource`) se décrit **avec la syntaxe d'objet de KingdomsX** : c'est son
+désérialiseur qui est appelé, lui-même bâti sur `XItemStack` de XSeries. Donc `material`, `amount`,
+`name`, `lore`, `enchants`, `stored-enchants`, `flags`, `attributes`, `effects`, `color`,
+`custom-model-data`, `unbreakable`, `glow`, `damage`, `skull`, `trim`, `item-model`, `nbt`… — les
+fichiers du plugin principal font office de référence. Deux options s'y ajoutent, propres à
+l'extension : `glint` et `consume-effects`.
 
-**Attention aux attributs** : les définir remplace les statistiques de base de l'objet. Sur une
+**Attention aux attributs** : les noms s'écrivent indifféremment `ARMOR` ou `GENERIC_ARMOR`,
+XSeries fait la correspondance avec ce que la version du serveur utilise. Donnez en revanche un
+`name` à chaque modificateur, en minuscules et de forme `namespace:clé` : sans lui XSeries en tire
+un UUID au hasard, et l'objet cesse d'être identique d'un démarrage à l'autre. Enfin, les définir
+remplace les statistiques de base de l'objet. Sur une
 arme ou une armure, précisez donc toutes celles que vous voulez — la portée d'une lance comprise.
 Repères vanilla (valeur affichée entre parenthèses) — épée netherite : 7 (8) dégâts / -2.4 (1.6)
 vitesse ; hache netherite : 9 (10) / -3.0 (1.0) ; lance netherite : 4 (5) / -3.13 (0.87) ;
 plastron netherite : 8 armure / 3 résistance / 0.1 résistance au recul ; casque et bottes : 3
 armure ; pantalon : 6 armure.
 
+**`glint`** donne le reflet enchanté par le composant prévu pour ça (1.20.5+). À préférer à `glow`,
+qui obtient le même reflet avec un enchantement masqué — et donne donc une Solidité I bien réelle à
+l'objet, ce qui casse le « mêmes caractéristiques que la netherite ».
+
 **`consume-effects`** donne des effets à un **aliment** quand il est mangé. Les effets d'une pomme
 d'or sont codés en dur dans le jeu et ne s'éditent pas : l'extension les applique elle-même à la
-consommation, juste avant ceux du jeu, qui ne peuvent alors plus les affaiblir.
+consommation, juste avant ceux du jeu, qui ne peuvent alors plus les affaiblir. Même forme que
+`effects` — `EFFET, secondes, niveau`, le niveau partant de 1 :
 
 ```yaml
           consume-effects:
-            ABSORPTION:   { duration: 2min, amplifier: 1 }
-            REGENERATION: { duration: 5s,   amplifier: 3 }
+            - 'ABSORPTION, 120, 2'    # Absorption II, deux minutes
+            - 'REGENERATION, 5, 4'    # Regeneration IV, cinq secondes
 ```
 
 ## Notes techniques
@@ -250,19 +265,23 @@ consommation, juste avant ceux du jeu, qui ne peuvent alors plus les affaiblir.
 - **Langues** — l'extension enregistre elle-même ses messages compilés pour chaque langue
   installée, en lisant son propre dossier. Les entrées manquantes retombent sur l'anglais du code,
   donc aucun message ne peut rester non résolu, même avec un fichier vide ou incomplet.
-- **Attributs** — appliqués par réflexion. Entre 1.16 et 1.21, Bukkit a changé la recherche des
-  attributs (énumération, puis registre, préfixe `GENERIC_` abandonné) et la construction des
-  modificateurs (`UUID + EquipmentSlot`, puis `NamespacedKey + EquipmentSlotGroup`). Les deux
-  chemins sont tentés, et l'option est ignorée avec un avertissement si aucun ne convient.
-- **Reflet enchanté** — `glow` utilise le composant dédié quand le serveur l'a (1.20.5+), sinon
-  l'astuce habituelle d'une Solidité I masquée, qui elle change légèrement l'objet. Cette
-  Solidité est retrouvée par son nom, jamais par `Enchantment.DURABILITY` : la constante a disparu
-  quand l'enchantement est devenu `UNBREAKING`, et une référence en dur vers un champ que le
-  serveur n'a plus lève un `NoSuchFieldError` au moment où la ligne s'exécute.
-- **Lecture des potions** — la `source` d'une transmutation est reconnue à l'effet qu'elle porte,
-  pas à son matériau : toutes les potions du jeu partagent `POTION`. La lecture passe par réflexion,
-  1.20.5 ayant remplacé `getBasePotionData()` — un type plus les drapeaux *extended* / *upgraded* —
-  par `getBasePotionType()`, où chaque variante connaît ses propres effets.
+- **Objets** — construits par `KingdomsItemDeserializer`, le désérialiseur de KingdomsX, qui
+  enveloppe `XItemStack` de XSeries. Matériaux, effets et attributs passent par `XMaterial`,
+  `XPotion` et `XAttribute` : c'est là que vit la connaissance des renommages entre versions, et la
+  réécrire à la main revient à s'approprier la dérive. L'extension n'ajoute que ce qui n'a pas
+  d'équivalent — `glint` et `consume-effects`.
+- **XSeries** — KingdomsX télécharge la bibliothèque, la relocalise en `org.kingdoms.libs.xseries`
+  et l'injecte dans **son propre** classloader de plugin, donc un addon qui dépend de Kingdoms la
+  voit. D'où la dépendance `provided` plus la relocalisation du shade plugin : on compile contre
+  elle et on réécrit nos références vers le paquet que KingdomsX a chargé, sans embarquer une seule
+  de ses classes. En embarquer une copie ne donnerait que deux XSeries sur le serveur.
+- **Lecture des potions** — la seule direction que XSeries ne couvre pas : `XItemStack` transforme
+  une configuration en objet, rien ne transforme un objet en la liste des effets qu'il porte, ce
+  dont une transmutation a précisément besoin pour recopier la durée et le niveau de la fiole. La
+  `source` est d'ailleurs reconnue à son effet et non à son matériau, toutes les potions du jeu
+  partageant `POTION`. Le reste passe par réflexion, 1.20.5 ayant remplacé `getBasePotionData()` —
+  un type plus les drapeaux *extended* / *upgraded* — par `getBasePotionType()`, où chaque variante
+  connaît ses propres effets.
 - **Ingrédients** — un ingrédient « matériau brut » ne consomme jamais un objet de spécialité du
   même matériau : la ressource et les objets sortis de la forge portent un tag persistant. Améliorer
   une épée de carbone déjà améliorée est donc impossible, plutôt que coûteux.
@@ -286,7 +305,7 @@ src/main/java/org/kingdoms/specialties/
 ├── config/                        config, langue, chemins de GUI
 ├── data/                          Specialty, recettes, métadonnées
 ├── gui/                           menu de sélection, menu de la forge
-├── items/                         parseur d'items, attributs, potions, tags
+├── items/                         fabrique d'objets, lecture des potions, tags
 ├── managers/                      extraction, forge, sélection, consommation
 └── structure/                     type de structure et installation du fichier
 src/main/resources/
