@@ -149,6 +149,10 @@ extraction:
 #  permet de depasser reellement la netherite. Quand vous en definissez un sur  #
 #  une arme ou une armure, precisez TOUTES les statistiques voulues, car celles #
 #  d'origine ne s'appliquent plus - la portee d'une lance comprise.             #
+#                                                                              #
+#  Le 'name' d'un attribut est l'identifiant du modificateur. Sans lui, XSeries #
+#  en tire un UUID au hasard : l'objet cesse d'etre identique d'un demarrage a  #
+#  l'autre. Donnez-en un, en minuscules, forme 'namespace:cle'.                 #
 #  Reperes vanilla (valeur affichee dans l'infobulle entre parentheses) :       #
 #    epee netherite      = 7 (8) degats   / -2.4 (1.6) vitesse                  #
 #    hache netherite     = 9 (10) degats  / -3.0 (1.0) vitesse                  #
@@ -201,10 +205,12 @@ specialties:
             - '&7Trempee dans le carbone du royaume.'
           attributes:
             ATTACK_DAMAGE:
+              name: specialties:epee-de-carbone-attack-damage
               amount: 9
               operation: ADD_NUMBER
               slot: HAND
             ATTACK_SPEED:
+              name: specialties:epee-de-carbone-attack-speed
               amount: -2.4
               operation: ADD_NUMBER
               slot: HAND
@@ -229,10 +235,12 @@ specialties:
             - '&7Trempee dans le carbone du royaume.'
           attributes:
             ATTACK_DAMAGE:
+              name: specialties:hache-de-carbone-attack-damage
               amount: 11
               operation: ADD_NUMBER
               slot: HAND
             ATTACK_SPEED:
+              name: specialties:hache-de-carbone-attack-speed
               amount: -3.0
               operation: ADD_NUMBER
               slot: HAND
@@ -264,14 +272,17 @@ specialties:
             - '&7Trempee dans le carbone du royaume.'
           attributes:
             ATTACK_DAMAGE:
+              name: specialties:lance-de-carbone-attack-damage
               amount: 6
               operation: ADD_NUMBER
               slot: HAND
             ATTACK_SPEED:
+              name: specialties:lance-de-carbone-attack-speed
               amount: -3.13
               operation: ADD_NUMBER
               slot: HAND
             ENTITY_INTERACTION_RANGE:
+              name: specialties:lance-de-carbone-entity-interaction-range
               amount: 1.5
               operation: ADD_NUMBER
               slot: HAND
@@ -317,14 +328,17 @@ specialties:
             - '&7Martele dans le mitril du royaume.'
           attributes:
             ARMOR:
+              name: specialties:casque-de-mitril-armor
               amount: 5
               operation: ADD_NUMBER
               slot: HEAD
             ARMOR_TOUGHNESS:
+              name: specialties:casque-de-mitril-armor-toughness
               amount: 4
               operation: ADD_NUMBER
               slot: HEAD
             KNOCKBACK_RESISTANCE:
+              name: specialties:casque-de-mitril-knockback-resistance
               amount: 0.1
               operation: ADD_NUMBER
               slot: HEAD
@@ -349,14 +363,17 @@ specialties:
             - '&7Martele dans le mitril du royaume.'
           attributes:
             ARMOR:
+              name: specialties:plastron-de-mitril-armor
               amount: 10
               operation: ADD_NUMBER
               slot: CHEST
             ARMOR_TOUGHNESS:
+              name: specialties:plastron-de-mitril-armor-toughness
               amount: 4
               operation: ADD_NUMBER
               slot: CHEST
             KNOCKBACK_RESISTANCE:
+              name: specialties:plastron-de-mitril-knockback-resistance
               amount: 0.1
               operation: ADD_NUMBER
               slot: CHEST
@@ -381,14 +398,17 @@ specialties:
             - '&7Martele dans le mitril du royaume.'
           attributes:
             ARMOR:
+              name: specialties:pantalon-de-mitril-armor
               amount: 8
               operation: ADD_NUMBER
               slot: LEGS
             ARMOR_TOUGHNESS:
+              name: specialties:pantalon-de-mitril-armor-toughness
               amount: 4
               operation: ADD_NUMBER
               slot: LEGS
             KNOCKBACK_RESISTANCE:
+              name: specialties:pantalon-de-mitril-knockback-resistance
               amount: 0.1
               operation: ADD_NUMBER
               slot: LEGS
@@ -413,14 +433,17 @@ specialties:
             - '&7Martelees dans le mitril du royaume.'
           attributes:
             ARMOR:
+              name: specialties:bottes-de-mitril-armor
               amount: 5
               operation: ADD_NUMBER
               slot: FEET
             ARMOR_TOUGHNESS:
+              name: specialties:bottes-de-mitril-armor-toughness
               amount: 4
               operation: ADD_NUMBER
               slot: FEET
             KNOCKBACK_RESISTANCE:
+              name: specialties:bottes-de-mitril-knockback-resistance
               amount: 0.1
               operation: ADD_NUMBER
               slot: FEET

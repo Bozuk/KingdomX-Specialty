@@ -116,12 +116,19 @@ public final class ExtractionListener implements Listener {
         }
 
         ItemStack[] items = stacks.toArray(new ItemStack[0]);
-        List<ItemStack> rejected = dropOverflow
-                ? XItemStack.giveOrDrop(player, items)
-                : XItemStack.addItems(player.getInventory(), false, items);
+
+        // giveOrDrop returns what it dropped at the player's feet, not what it failed to hand
+        // over: those units are delivered, and counting them as leftovers would credit them back
+        // to the kingdom on top of the items now lying on the ground.
+        if (dropOverflow) {
+            XItemStack.giveOrDrop(player, items);
+            return 0;
+        }
 
         long undelivered = 0;
-        for (ItemStack left : rejected) undelivered += left.getAmount();
+        for (ItemStack left : XItemStack.addItems(player.getInventory(), false, items)) {
+            undelivered += left.getAmount();
+        }
         return undelivered;
     }
 

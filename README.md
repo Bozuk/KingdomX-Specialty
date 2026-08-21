@@ -174,8 +174,11 @@ La forge n'a pas de grille de craft : une `shape` sert uniquement à compter les
           name: '&cLame'
           glint: true                        # le reflet enchante
           attributes:                        # ce qui dépasse vraiment la netherite
-            ATTACK_DAMAGE: { amount: 9, operation: ADD_NUMBER, slot: HAND }
-            ATTACK_SPEED:  { amount: -2.4, operation: ADD_NUMBER, slot: HAND }
+            ATTACK_DAMAGE:
+              name: specialties:ma-recette-attack-damage
+              amount: 9
+              operation: ADD_NUMBER
+              slot: HAND
 ```
 
 Recette de transmutation — une potion `source` est consommée, et le résultat **reprend la durée et
@@ -209,7 +212,9 @@ fichiers du plugin principal font office de référence. Deux options s'y ajoute
 l'extension : `glint` et `consume-effects`.
 
 **Attention aux attributs** : les noms s'écrivent indifféremment `ARMOR` ou `GENERIC_ARMOR`,
-XSeries fait la correspondance avec ce que la version du serveur utilise. En revanche, les définir
+XSeries fait la correspondance avec ce que la version du serveur utilise. Donnez en revanche un
+`name` à chaque modificateur, en minuscules et de forme `namespace:clé` : sans lui XSeries en tire
+un UUID au hasard, et l'objet cesse d'être identique d'un démarrage à l'autre. Enfin, les définir
 remplace les statistiques de base de l'objet. Sur une
 arme ou une armure, précisez donc toutes celles que vous voulez — la portée d'une lance comprise.
 Repères vanilla (valeur affichée entre parenthèses) — épée netherite : 7 (8) dégâts / -2.4 (1.6)
