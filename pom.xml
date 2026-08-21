@@ -15,7 +15,18 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>8</maven.compiler.release>
-        <kingdoms.version>1.17.18.1-BETA</kingdoms.version>
+        <!--
+          The version of the server this is built for. Maven Central stops at 1.17.18.1-BETA, so a
+          newer one has to be installed from the server's own plugin jar - which is also the more
+          faithful thing to build against:
+
+            mvn install:install-file -Dfile=<server>/plugins/KingdomsX-1.17.27.3.jar                 -DgroupId=com.github.cryptomorin -DartifactId=kingdoms                 -Dversion=1.17.27.3 -Dpackaging=jar
+
+          Signatures do move between releases: 1.17.27.3 renamed KingdomItemInteractEvent to
+          KingdomBuildingInteractEvent and getKingdomItem() to getBuilding(). Recompiling is how
+          you find out, so bump this and build before deploying to a newer server.
+        -->
+        <kingdoms.version>1.17.27.3</kingdoms.version>
         <spigot.version>1.16.5-R0.1-SNAPSHOT</spigot.version>
     </properties>
 

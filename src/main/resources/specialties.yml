@@ -115,6 +115,9 @@ extraction:
 #                 permet a une potion de poison de devenir une potion de wither #
 #                 de la meme duree et du meme niveau, quelle que soit la fiole. #
 #                                                                              #
+#  Les noms d'effets acceptent les deux orthographes : STRENGTH comme          #
+#  INCREASE_DAMAGE, 1.20.5 ayant renomme les effets.                            #
+#                                                                              #
 #  '@resource' designe la ressource unique de la specialite.                    #
 #                                                                              #
 #  Un objet ('result' ou 'resource') se decrit ainsi :                          #
@@ -471,13 +474,13 @@ specialties:
           - '&8Meme duree que la fiole utilisee.'
         source:
           material: POTION
-          effect: INCREASE_DAMAGE
+          effect: STRENGTH
           amplifier: 1
           name: '&4Potion de Force II'
         ingredients:
           - '@resource'
         transmute:
-          effect: INCREASE_DAMAGE
+          effect: STRENGTH
           amplifier-shift: 1
         result:
           material: POTION
