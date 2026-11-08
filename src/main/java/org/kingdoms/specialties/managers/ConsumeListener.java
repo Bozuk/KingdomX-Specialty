@@ -4,7 +4,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.kingdoms.libs.xseries.XPotion;
+import com.cryptomorin.xseries.XPotion;
 import org.kingdoms.specialties.items.SpecialtyItems;
 
 import java.util.List;

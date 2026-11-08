@@ -10,7 +10,7 @@ import org.kingdoms.constants.land.Land;
 import org.kingdoms.constants.land.structures.objects.Extractor;
 import org.kingdoms.constants.player.KingdomPlayer;
 import org.kingdoms.events.items.structures.ExtractorCollectEvent;
-import org.kingdoms.libs.xseries.XItemStack;
+import com.cryptomorin.xseries.XItemStack;
 import org.kingdoms.specialties.config.SpecialtiesLang;
 import org.kingdoms.specialties.data.KingdomSpecialties;
 import org.kingdoms.specialties.data.Specialty;

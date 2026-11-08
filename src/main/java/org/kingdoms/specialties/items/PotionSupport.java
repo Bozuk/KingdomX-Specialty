@@ -6,7 +6,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
-import org.kingdoms.libs.xseries.XPotion;
+import com.cryptomorin.xseries.XPotion;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

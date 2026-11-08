@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
-import org.kingdoms.libs.xseries.XItemStack;
+import com.cryptomorin.xseries.XItemStack;
 import org.kingdoms.specialties.config.SpecialtiesLang;
 import org.kingdoms.specialties.data.Specialty;
 import org.kingdoms.specialties.data.SpecialtyRecipe;

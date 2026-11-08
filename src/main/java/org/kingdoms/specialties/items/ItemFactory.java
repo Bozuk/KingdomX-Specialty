@@ -5,8 +5,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffectType;
 import org.kingdoms.config.accessor.ConfigAccessor;
-import org.kingdoms.libs.xseries.XMaterial;
-import org.kingdoms.libs.xseries.XPotion;
+import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.XPotion;
 import org.kingdoms.specialties.SpecialtiesAddon;
 import org.kingdoms.utils.KingdomsItemDeserializer;
 

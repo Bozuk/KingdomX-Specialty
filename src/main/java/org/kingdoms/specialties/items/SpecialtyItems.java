@@ -5,7 +5,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.kingdoms.libs.xseries.XPotion;
+import com.cryptomorin.xseries.XPotion;
 import org.kingdoms.specialties.SpecialtiesAddon;
 import org.kingdoms.specialties.data.Specialty;
 

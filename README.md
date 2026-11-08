@@ -31,17 +31,18 @@ netherite sword — plus the enchanted shimmer and the bonus above.
    - a `specialty-forge` entry in `guis/<language>/structures/nexus/structures.yml`, the structure
      shop — without it the forge does not show up there (see the technical notes).
 
-Requirements: Minecraft **1.16+**, KingdomsX **1.17.27.3**. Folia is supported.
+Requirements: Minecraft **1.16+**, KingdomsX **1.17.28** (XSeries 14.0.0). Folia is supported.
 
 **Rebuild on every KingdomsX version bump, before deploying.** Signatures really do move: 1.17.27.3
 renamed `KingdomItemInteractEvent` to `KingdomBuildingInteractEvent` and `getKingdomItem()` to
 `getBuilding()`, which gives a `NoSuchMethodError` when the forge is opened if the addon was built
 against an earlier one. Compiling is the fastest way to find those breaks. Maven Central stops at
 1.17.18.1-BETA, so install your own server's jar — which is also the more faithful thing to build
-against:
+against. Bump `xseries.version` in `pom.xml` too when KingdomsX moves to another XSeries — 1.17.28
+went from 13.7.1 to 14.0.0:
 
 ```bash
-mvn install:install-file -Dfile=<server>/plugins/KingdomsX-1.17.27.3.jar -DgroupId=com.github.cryptomorin -DartifactId=kingdoms -Dversion=1.17.27.3 -Dpackaging=jar
+mvn install:install-file -Dfile=<server>/plugins/KingdomsX-1.17.28.jar -DgroupId=com.github.cryptomorin -DartifactId=kingdoms -Dversion=1.17.28 -Dpackaging=jar
 ```
 
 **Spears** (`NETHERITE_SPEAR`) only exist since **1.21.11**. On an older server that one recipe is
@@ -269,7 +270,9 @@ before the game applies its own, which can then no longer weaken them. Same shap
   injects it into **its own** plugin classloader, so an addon that depends on Kingdoms can see it.
   Hence the `provided` dependency plus the shade relocation: we compile against it and rewrite our
   references to the copy KingdomsX loaded, without shipping a single one of its classes. Shipping
-  our own copy would only mean two XSeries on the server.
+  our own copy would only mean two XSeries on the server. The sources therefore import
+  `com.cryptomorin.xseries`: `org.kingdoms.libs.xseries` only exists at runtime, the plugin jar
+  does not contain it.
 - **Reading potions** — the one direction XSeries does not cover: `XItemStack` turns configuration
   into an item, nothing turns an item back into the effects it carries, which is exactly what a
   transmutation needs in order to copy the duration and the level of a bottle. The `source` is
