@@ -6,3 +6,5 @@ author: KingdomX-Speciality
 api-version: "1.16"
 folia-supported: true
 depend: [ Kingdoms ]
+# Only for the order: the forge's schematic is checked once EngineHub has set up its own.
+softdepend: [ Kingdoms-Addon-EngineHub ]

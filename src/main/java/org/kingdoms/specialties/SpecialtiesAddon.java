@@ -21,6 +21,7 @@ import org.kingdoms.specialties.managers.ConsumeListener;
 import org.kingdoms.specialties.managers.ExtractionListener;
 import org.kingdoms.specialties.locale.SpecialtiesLanguages;
 import org.kingdoms.specialties.managers.KingdomCreationListener;
+import org.kingdoms.specialties.structure.ForgeSchematicInstaller;
 import org.kingdoms.specialties.structure.NexusMenuInstaller;
 import org.kingdoms.specialties.structure.SpecialtyForgeStructureType;
 import org.kingdoms.specialties.structure.StructureInstaller;
@@ -67,6 +68,9 @@ public final class SpecialtiesAddon extends JavaPlugin implements Addon {
         // Must happen before KingdomsX reads the Structures folder, which it does in its onEnable.
         StructureRegistry.get().registerType(SpecialtyForgeStructureType.INSTANCE);
         structureInstalled = StructureInstaller.installEarly();
+
+        // Must happen before EngineHub loads the schematics folder, which it does in its onEnable.
+        ForgeSchematicInstaller.extract();
     }
 
     @Override
@@ -82,6 +86,7 @@ public final class SpecialtiesAddon extends JavaPlugin implements Addon {
 
         Specialty.reload();
         if (!structureInstalled) StructureInstaller.installLate();
+        ForgeSchematicInstaller.assign();
         NexusMenuInstaller.verifyRegistered();
 
         // The structure shop lists what its own GUI file names, not what the registry holds.
