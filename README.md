@@ -27,6 +27,8 @@ netherite sword — plus the enchanted shimmer and the bonus above.
    - `plugins/Kingdoms/specialties.yml` — the configuration;
    - `plugins/Kingdoms/specialties/languages/<code>.yml` — one message file per language;
    - `plugins/Kingdoms/Structures/specialty-forge.yml` — the structure;
+   - `plugins/Kingdoms/schematics/structures/specialty-forge/1.schem` — its schematic, **only if the
+     official EngineHub addon is installed** (see *Schematic* below);
    - its menus in the KingdomsX GUI folders;
    - a `specialty-forge` entry in `guis/<language>/structures/nexus/structures.yml`, the structure
      shop — without it the forge does not show up there (see the technical notes).
@@ -152,6 +154,34 @@ Fuel, rate and yield of the extractors are configured on the KingdomsX side, in
 `Structures/extractor.yml`. The forge's cost, limits and blocks in
 `Structures/specialty-forge.yml`.
 
+### Schematic
+
+With the official **EngineHub** addon (WorldEdit), KingdomsX builds structures out of schematics
+instead of a single block. The addon ships one for the forge, in EngineHub's own layout: a 3×3
+smithing station — the smithing table in the middle, which is the block players right-click,
+polished blackstone around it and a lantern on each corner post.
+
+- **The file** is copied to `plugins/Kingdoms/schematics/structures/specialty-forge/1.schem` when it
+  is missing, never over an existing one — whatever extension EngineHub gave it since. Edit it in
+  place with WorldEdit, or delete it to get the original back on the next start.
+- **The assignment** — a forge level picks its schematic with the `schematic` option of its
+  `building` section, the option EngineHub reads. On startup, every level that has **none** — in the
+  forge's file or in the building declaration it imports — is pointed at the shipped file:
+
+  ```yaml
+  building:
+    1:
+      schematic: structures/specialty-forge/1   # name = path under schematics/, no extension
+  ```
+
+  A level that already names one is **never touched**: to use your own, save it with
+  `/k admin schematic save <name>` and put its name there. EngineHub's own setup writes
+  `<type>/<name>/<level>` into the building declaration, which for the forge is the shipped file.
+  A level naming a schematic that is not in `schematics/` gets a warning in the console, since
+  EngineHub then silently builds it as a single block.
+
+Without EngineHub, neither the file nor the option is written.
+
 ### Adding a recipe
 
 Under `specialties.<specialty>.recipes`. Three types: `SHAPED`, `SHAPELESS` and `TRANSMUTE`.
@@ -251,6 +281,13 @@ before the game applies its own, which can then no longer weaken them. Same shap
   `Structures/specialty-forge.yml` file is only written after the default structures have been
   extracted: creating that folder too early would stop KingdomsX from putting its own in it on a
   brand new server.
+- **Schematic** — EngineHub reads every file of `Kingdoms/schematics` and names it after its path
+  relative to that folder, without the extension. The file is written from `onLoad()`, so it is
+  there when EngineHub loads the folder in its `onEnable()`; this does not stop EngineHub from
+  copying its own defaults, which it does whether the folder exists or not. The option is checked
+  on the configuration as KingdomsX resolved it, imports included, for every style of the forge
+  type — not just the one named `specialty-forge` — and only written into the raw file, which keeps
+  its comments and its `(import)`. A `softdepend` on EngineHub makes that check run after its setup.
 - **Shop menu** — registering the structure is not enough to make it buyable. KingdomsX walks the
   registered structures and, for each of them, looks for an option **of the same name** in
   `guis/<language>/structures/nexus/structures.yml`; a structure with no entry there is skipped
@@ -309,6 +346,7 @@ src/main/java/org/kingdoms/specialties/
 src/main/resources/
 ├── specialties.yml
 ├── Structures/specialty-forge.yml
+├── schematics/structures/specialty-forge/1.schem
 ├── menu/nexus-structures-option.yml
 └── guis/
     ├── specialties/selection.yml
